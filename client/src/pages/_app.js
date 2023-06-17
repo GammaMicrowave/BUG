@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 
 import { useMemo, useState } from "react";
-import { storeLS } from "@/utils/storage";
+import { storeLS } from "@/utils/localStorage";
 import { getTheme } from "@/config/theme.config.js";
 
 function conditionalWrapper(condition, Parent, parentProps, Children) {
