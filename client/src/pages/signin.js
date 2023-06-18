@@ -56,7 +56,7 @@ function signup() {
                   textDecoration: "underline",
                 },
               }}
-              onClick={() => router.push("/signun")}
+              onClick={() => router.push("/signup")}
             >
               Sign Up
             </Typography>
