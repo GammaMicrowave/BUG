@@ -3,6 +3,8 @@ import "@/styles/globals.css";
 import { useMemo, useState } from "react";
 import { storeLS } from "@/utils/localStorage";
 import { getTheme } from "@/config/theme.config.js";
+import { ThemeProvider } from "@mui/material/styles";
+import ThemeContext from "@/contexts/theme.context";
 
 function conditionalWrapper(condition, Parent, parentProps, Children) {
   if (condition) {
@@ -20,5 +22,13 @@ export default function App({ Component, pageProps }) {
     setMode((prevMode) => (prevMode === "dark" ? "light" : "dark"));
   }
 
-  return <Component {...pageProps} />;
+  return (
+    <>
+      <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        <ThemeProvider theme={theme}>
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </ThemeContext.Provider>
+    </>
+  );
 }
