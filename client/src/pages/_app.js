@@ -5,6 +5,8 @@ import { storeLS } from "@/utils/localStorage";
 import { getTheme } from "@/config/theme.config.js";
 import { ThemeProvider } from "@mui/material/styles";
 import ThemeContext from "@/contexts/theme.context";
+import Navbar from "@/components/Navbar";
+import Container from "@mui/material/Container";
 
 function conditionalWrapper(condition, Parent, parentProps, Children) {
   if (condition) {
@@ -26,7 +28,21 @@ export default function App({ Component, pageProps }) {
     <>
       <ThemeContext.Provider value={{ theme, toggleTheme }}>
         <ThemeProvider theme={theme}>
-          <Component {...pageProps} />
+          <Navbar />
+          <Container
+            // maxWidth="xl"
+            maxWidth={false}
+            sx={{
+              bgcolor: "background.default",
+              minHeight: "100vh",
+              display: "flex",
+              flexDirection: "column",
+              flexGrow: 1,
+              p: 3,
+            }}
+          >
+            <Component {...pageProps} />
+          </Container>
         </ThemeProvider>
       </ThemeContext.Provider>
     </>
