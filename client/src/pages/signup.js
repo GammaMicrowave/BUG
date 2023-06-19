@@ -4,6 +4,9 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import FileUpload from "@/components/FileUpload";
 import AdbIcon from "@mui/icons-material/Adb";
+import cookieCutter from "cookie-cutter";
+import { useMutation } from "react-query";
+import { signUpUser } from "@/API/auth.api.js";
 
 function signup() {
   const router = useRouter();
@@ -17,8 +20,30 @@ function signup() {
     confirmPassword: "",
   });
 
+  const { mutateAsync, isLoading } = useMutation(signUpUser, {
+    onSuccess: (res) => {
+      // cookieCutter.set("jwt_token", res.data.token);
+      // router.push("/");
+      console.log(res);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
+
   const handleSubmit = (e) => {
-    console.log(data);
+    e.preventDefault();
+    mutateAsync({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      bio: data.bio,
+      image: files,
+      email: data.email,
+      password: data.password,
+    }).then((res) => {
+      cookieCutter.set("jwt_token", res.token);
+      router.push("/");
+    });
   };
 
   return (

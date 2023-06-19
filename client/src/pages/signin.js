@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import AdbIcon from "@mui/icons-material/Adb";
 
-function signup() {
+function signin() {
   const router = useRouter();
   const [data, setData] = useState({
     email: "",
