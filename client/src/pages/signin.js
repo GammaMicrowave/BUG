@@ -3,6 +3,11 @@ import React from "react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import AdbIcon from "@mui/icons-material/Adb";
+import { signInUser } from "@/API/auth.api";
+import { useMutation } from "react-query";
+import cookieCutter from "cookie-cutter";
+import CircularProgress from "@mui/material/CircularProgress";
+import { LoadingButton } from "@mui/lab";
 
 function signin() {
   const router = useRouter();
@@ -11,8 +16,25 @@ function signin() {
     password: "",
   });
 
+  const { mutateAsync, isLoading } = useMutation(signInUser, {
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   const handleSubmit = (e) => {
-    console.log(data);
+    e.preventDefault();
+    mutateAsync({
+      email: data.email,
+      password: data.password,
+    }).then((res) => {
+      cookieCutter.set("jwt_token", res.token, {
+        expires: 30,
+        httpOnly: true,
+      });
+      window.location.reload();
+      router.push("/");
+    });
   };
 
   return (
@@ -41,9 +63,14 @@ function signin() {
             onChange={(e) => setData({ ...data, password: e.target.value })}
           />
 
-          <Button variant="contained" onClick={handleSubmit}>
+          <LoadingButton
+            loading={isLoading}
+            variant="contained"
+            onClick={handleSubmit}
+          >
             Submit
-          </Button>
+          </LoadingButton>
+
           <div className="flex flex-row justify-center">
             <Typography variant="h6">Don't have an account?</Typography>
             <Typography
@@ -67,4 +94,4 @@ function signin() {
   );
 }
 
-export default signup;
+export default signin;

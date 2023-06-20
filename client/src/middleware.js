@@ -1,11 +1,22 @@
-// import { NextResponse } from "next/server";
-// import type { NextRequest } from 'next/server'
-
-// This function can be marked `async` if using `await` inside
+import { NextResponse } from "next/server";
 export function middleware(request) {
-  // console.log(request.url);
-  // console.log(request.cookies.get("jwt_token").value);
-  //   return NextResponse.redirect(new URL("/home", request.url));
+  const isLoggedIn = request.cookies.get("jwt_token").value ? true : false;
+  const url = request.nextUrl.clone();
+  if (isLoggedIn) {
+    if (
+      request.nextUrl.pathname === "/signin" ||
+      request.nextUrl.pathname === "/signup"
+    ) {
+      url.pathname = "/";
+      return NextResponse.redirect(url);
+    }
+  } else {
+    const pathname = request.nextUrl.pathname;
+    if (pathname !== "/signin" && pathname !== "/signup" && pathname !== "/") {
+      url.pathname = "/signin";
+      return NextResponse.redirect(url);
+    }
+  }
 }
 
 export const config = {

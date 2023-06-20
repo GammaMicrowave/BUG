@@ -7,6 +7,8 @@ import AdbIcon from "@mui/icons-material/Adb";
 import cookieCutter from "cookie-cutter";
 import { useMutation } from "react-query";
 import { signUpUser } from "@/API/auth.api.js";
+import CircularProgress from "@mui/material/CircularProgress";
+import { LoadingButton } from "@mui/lab";
 
 function signup() {
   const router = useRouter();
@@ -21,11 +23,6 @@ function signup() {
   });
 
   const { mutateAsync, isLoading } = useMutation(signUpUser, {
-    onSuccess: (res) => {
-      // cookieCutter.set("jwt_token", res.data.token);
-      // router.push("/");
-      console.log(res);
-    },
     onError: (err) => {
       console.log(err);
     },
@@ -41,8 +38,11 @@ function signup() {
       email: data.email,
       password: data.password,
     }).then((res) => {
-      cookieCutter.set("jwt_token", res.token);
-      router.push("/");
+      cookieCutter.set("jwt_token", res.token, {
+        expires: 30,
+        httpOnly: true,
+      });
+      window.location.reload();
     });
   };
 
@@ -112,9 +112,13 @@ function signup() {
           />
           <FileUpload files={files} setFiles={setFiles} />
 
-          <Button variant="contained" onClick={handleSubmit}>
+          <LoadingButton
+            loading={isLoading}
+            variant="contained"
+            onClick={handleSubmit}
+          >
             Submit
-          </Button>
+          </LoadingButton>
           <div className="flex flex-row justify-center">
             <Typography variant="h6">Already have an account?</Typography>
             <Typography

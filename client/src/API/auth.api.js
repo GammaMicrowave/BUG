@@ -26,3 +26,13 @@ export async function signUpUser({
     return Promise.reject(res);
   }
 }
+
+export async function signInUser({ email, password }) {
+  let res = await post("/auth/signin", { email, password });
+  if (res.status === 200) {
+    // cookieCutter.set("jwt_token", res.data.token);
+    return Promise.resolve(res.data.data);
+  } else {
+    return Promise.reject(res);
+  }
+}

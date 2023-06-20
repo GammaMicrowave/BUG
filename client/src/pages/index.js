@@ -12,27 +12,23 @@ import Navbar from "@/components/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+export default function Home({ isLoggedIn }) {
   return (
     <>
-      <div>index</div>
+      <div className="h-24 w-24 bg-red-500">index</div>
+
+      <div className="text-white">
+        user is logged in = {isLoggedIn ? "true" : "false"}
+      </div>
     </>
   );
 }
 
 export const getServerSideProps = ({ req, res }) => {
-  // console.log(req, res);
-  // console.log(req.cookies);
-  // setCookie("test", JSON.stringify(req.cookies), {
-  //   req,
-  //   res,
-  //   maxAge: 60 * 6 * 24,
-  // });
-  // getCookie("test", { req, res });
-  // getCookies({ req, res });
-  // console.log(getCookies({ req, res }));
-  // console.log(getCookie("test", { req, res }));
-  // deleteCookie("test", { req, res });
-
-  return { props: {} };
+  const isLoggedIn = req.cookies["jwt_token"] ? true : false;
+  return {
+    props: {
+      isLoggedIn,
+    },
+  };
 };
