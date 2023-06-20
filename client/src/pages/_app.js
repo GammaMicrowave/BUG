@@ -41,7 +41,7 @@ export default function App({ Component, pageProps }) {
                 maxWidth={false}
                 sx={{
                   bgcolor: "background.default",
-                  minHeight: "100vh",
+                  minHeight: "calc(100vh - 64px)",
                   display: "flex",
                   flexDirection: "column",
                   flexGrow: 1,

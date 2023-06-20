@@ -7,10 +7,12 @@ import {
   ImageList,
   ImageListItem,
   Button,
+  IconButton,
 } from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import CancelIcon from "@mui/icons-material/Cancel";
 
-export default function FileUpload({ files, setFiles }) {
+export default function FileUpload({ files, setFiles, helperText }) {
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
       "image/jpeg": [],
@@ -58,7 +60,7 @@ export default function FileUpload({ files, setFiles }) {
               startIcon={<AddRoundedIcon className="w-8 h-8" />}
             >
               <Typography variant="body2" className="text-center capitalize">
-                Add a Profile Picture
+                {helperText}
               </Typography>
             </Button>
           </>
@@ -67,12 +69,23 @@ export default function FileUpload({ files, setFiles }) {
             <ImageList sx={{ width: "100%", height: "100%" }} cols={1}>
               {files.map((item) => (
                 <ImageListItem key={item.src}>
-                  <img
-                    src={`${item.src}`}
-                    srcSet={`${item.src}`}
-                    alt={item.id}
-                    loading="lazy"
-                  />
+                  <div className="relative">
+                    <IconButton
+                      className="absolute right-2 top-2"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setFiles([]);
+                      }}
+                    >
+                      <CancelIcon />
+                    </IconButton>
+                    <img
+                      src={`${item.src}`}
+                      srcSet={`${item.src}`}
+                      alt={item.id}
+                      loading="lazy"
+                    />
+                  </div>
                 </ImageListItem>
               ))}
             </ImageList>
