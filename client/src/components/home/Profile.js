@@ -18,7 +18,6 @@ function Profile() {
 
   return (
     <div className=" w-full">
-      {/* FIRST ROW */}
       <div
         className="flex justify-between items-center"
         gap="0.5rem"
