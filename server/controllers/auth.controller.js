@@ -13,15 +13,18 @@ export async function signUp(req, res) {
   let image = req.file;
   try {
     if (!firstName || !bio || !email || password.length < 8) {
-      return response_400(res, "Invalid data");
+      return response_400(res, "Some Input fields are invalid");
     }
     if (!lastName) {
       lastName = "";
     }
-    if (!image) {
-      image = "";
+
+    let imageUrl =
+      "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png";
+    if (image) {
+      imageUrl = await uploadImage(image);
     }
-    const imageUrl = await uploadImage(image);
+    
     const salt = await bcrypt.genSalt(16);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -53,7 +56,7 @@ export async function signIn(req, res) {
   const { email, password } = req.body;
   try {
     if (!email || !password) {
-      return response_400(res, "input invalid");
+      return response_400(res, "Email or Password is missing");
     }
     const user = await prisma.user.findUnique({
       where: {
@@ -61,11 +64,11 @@ export async function signIn(req, res) {
       },
     });
     if (!user) {
-      return response_400(res, "user not present");
+      return response_400(res, "User not found");
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return response_400(res, "wrong password");
+      return response_400(res, "Invalid Credentials");
     }
     const token = jwt.sign(
       {

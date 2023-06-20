@@ -9,6 +9,7 @@ import { useMutation } from "react-query";
 import { signUpUser } from "@/API/auth.api.js";
 import CircularProgress from "@mui/material/CircularProgress";
 import { LoadingButton } from "@mui/lab";
+import { enqueueSnackbar } from "notistack";
 
 function signup() {
   const router = useRouter();
@@ -22,11 +23,7 @@ function signup() {
     confirmPassword: "",
   });
 
-  const { mutateAsync, isLoading } = useMutation(signUpUser, {
-    onError: (err) => {
-      console.log(err);
-    },
-  });
+  const { mutateAsync, isLoading } = useMutation(signUpUser);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -37,13 +34,18 @@ function signup() {
       image: files,
       email: data.email,
       password: data.password,
-    }).then((res) => {
-      cookieCutter.set("jwt_token", res.token, {
-        expires: 30,
-        httpOnly: true,
+    })
+      .then((res) => {
+        cookieCutter.set("jwt_token", res.token, {
+          expires: 30,
+          httpOnly: true,
+        });
+        enqueueSnackbar("Signed up successfully", { variant: "success" });
+        window.location.reload();
+      })
+      .catch((err) => {
+        enqueueSnackbar(err.data.error, { variant: "error" });
       });
-      window.location.reload();
-    });
   };
 
   return (

@@ -9,6 +9,7 @@ import Navbar from "@/components/Navbar";
 import Container from "@mui/material/Container";
 import { QueryClientProvider, QueryClient } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
+import { SnackbarProvider } from "notistack";
 
 const queryClient = new QueryClient();
 
@@ -33,21 +34,23 @@ export default function App({ Component, pageProps }) {
       <QueryClientProvider client={queryClient}>
         <ThemeContext.Provider value={{ theme, toggleTheme }}>
           <ThemeProvider theme={theme}>
-            <Navbar />
-            <Container
-              // maxWidth="xl"
-              maxWidth={false}
-              sx={{
-                bgcolor: "background.default",
-                minHeight: "100vh",
-                display: "flex",
-                flexDirection: "column",
-                flexGrow: 1,
-                p: 3,
-              }}
-            >
-              <Component {...pageProps} />
-            </Container>
+            <SnackbarProvider maxSnack={3}>
+              <Navbar />
+              <Container
+                // maxWidth="xl"
+                maxWidth={false}
+                sx={{
+                  bgcolor: "background.default",
+                  minHeight: "100vh",
+                  display: "flex",
+                  flexDirection: "column",
+                  flexGrow: 1,
+                  p: 3,
+                }}
+              >
+                <Component {...pageProps} />
+              </Container>
+            </SnackbarProvider>
           </ThemeProvider>
         </ThemeContext.Provider>
         <ReactQueryDevtools initialIsOpen={false} />

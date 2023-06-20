@@ -7,6 +7,7 @@ import { signInUser } from "@/API/auth.api";
 import { useMutation } from "react-query";
 import cookieCutter from "cookie-cutter";
 import CircularProgress from "@mui/material/CircularProgress";
+import { enqueueSnackbar } from "notistack";
 import { LoadingButton } from "@mui/lab";
 
 function signin() {
@@ -16,25 +17,32 @@ function signin() {
     password: "",
   });
 
-  const { mutateAsync, isLoading } = useMutation(signInUser, {
-    onError: (error) => {
-      console.log(error);
-    },
-  });
+  const { mutateAsync, isLoading } = useMutation(signInUser);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     mutateAsync({
       email: data.email,
       password: data.password,
-    }).then((res) => {
-      cookieCutter.set("jwt_token", res.token, {
-        expires: 30,
-        httpOnly: true,
+    })
+      .then((res) => {
+        cookieCutter.set("jwt_token", res.token, {
+          expires: 30,
+          httpOnly: true,
+        });
+        enqueueSnackbar("Logged in successfully", { variant: "success" });
+        window.location.reload();
+        router.push("/");
+      })
+      .catch((err) => {
+        enqueueSnackbar(err.data.error, { variant: "error" });
       });
-      window.location.reload();
-      router.push("/");
-    });
+  };
+
+  const handleEnter = (e) => {
+    if (e.key === "Enter") {
+      handleSubmit(e);
+    }
   };
 
   return (
@@ -52,6 +60,7 @@ function signin() {
             label="Email"
             variant="outlined"
             value={data.email}
+            onKeyDown={handleEnter}
             onChange={(e) => setData({ ...data, email: e.target.value })}
           />
           <TextField
@@ -60,12 +69,14 @@ function signin() {
             variant="outlined"
             type="password"
             value={data.password}
+            onKeyDown={handleEnter}
             onChange={(e) => setData({ ...data, password: e.target.value })}
           />
 
           <LoadingButton
             loading={isLoading}
             variant="contained"
+            onKeyDown={handleEnter}
             onClick={handleSubmit}
           >
             Submit

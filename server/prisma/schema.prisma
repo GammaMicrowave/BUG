@@ -13,16 +13,30 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  name      String?
-  bio       String?
-  image     String?
-  password  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-  posts     Post[]
+  id            String                      @id @default(uuid())
+  email         String                      @unique
+  name          String?
+  bio           String?
+  image         String?
+  password      String
+  createdAt     DateTime                    @default(now())
+  updatedAt     DateTime                    @updatedAt
+  deletedAt     DateTime?
+  posts         Post[]
+  otherProfiles otherProfilesUserRelation[]
+  following     User[]                      @relation("UserToUser")
+  followers     User[]                      @relation("UserToUser")
+
+  @@index([email])
+}
+
+model otherProfilesUserRelation {
+  id               String @id @default(uuid())
+  userId           String
+  userRelation     User   @relation(fields: [userId], references: [id])
+  otherProfileLink String
+
+  @@index([userId])
 }
 
 model Post {

@@ -21,7 +21,7 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 import ChatIcon from "@mui/icons-material/Chat";
 import cookieCutter from "cookie-cutter";
 import { useRouter } from "next/router";
-const pages = ["Products", "Pricing", "Blog"];
+const pages = ["Home", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 function ResponsiveAppBar() {
   const router = useRouter();
@@ -40,7 +40,10 @@ function ResponsiveAppBar() {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleCloseNavMenu = () => {
+  const handleCloseNavMenu = (e) => {
+    // console.log(e.target.innerText);
+    const page = e.target.innerText.toLowerCase();
+    router.push(`/${page}`);
     setAnchorElNav(null);
   };
 
@@ -68,7 +71,11 @@ function ResponsiveAppBar() {
     >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
+          <Box
+            sx={{
+              display: { xs: "flex", md: "none" },
+            }}
+          >
             <IconButton
               size="large"
               aria-label="account of current user"
@@ -104,14 +111,19 @@ function ResponsiveAppBar() {
               ))}
             </Menu>
           </Box>
-          <AdbIcon sx={{ display: "flex", mr: 1 }} />
+          <AdbIcon
+            sx={{
+              display: "flex",
+              mr: 1,
+            }}
+          />
           <Typography
             variant="h6"
             noWrap
-            component="a"
-            href="/"
+            onClick={() => {
+              router.push("/");
+            }}
             sx={{
-              mr: 2,
               display: "flex",
               fontFamily: "monospace",
               fontWeight: 700,
@@ -120,12 +132,14 @@ function ResponsiveAppBar() {
                 xs: 1,
                 md: 0,
               },
-              letterSpacing: ".3rem",
+              paddingRight: "0.2rem",
+              paddingTop: "0.2rem",
+              letterSpacing: ".2rem",
               color: "inherit",
               textDecoration: "none",
             }}
           >
-            LOGO
+            BUG
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
