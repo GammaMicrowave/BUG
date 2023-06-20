@@ -53,7 +53,7 @@ export async function signIn(req, res) {
   const { email, password } = req.body;
   try {
     if (!email || !password) {
-      return response_400(res, "Invalid data");
+      return response_400(res, "input invalid");
     }
     const user = await prisma.user.findUnique({
       where: {
@@ -61,11 +61,11 @@ export async function signIn(req, res) {
       },
     });
     if (!user) {
-      return response_400(res, "Invalid data");
+      return response_400(res, "user not present");
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return response_400(res, "Invalid data");
+      return response_400(res, "wrong password");
     }
     const token = jwt.sign(
       {
