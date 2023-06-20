@@ -26,6 +26,9 @@ model User {
   otherProfiles otherProfilesUserRelation[]
   following     User[]                      @relation("UserToUser")
   followers     User[]                      @relation("UserToUser")
+  location      String?                     @default("")
+  occupation    String?                     @default("")
+  viewedProfile Int                         @default(0)
 
   @@index([email])
 }
