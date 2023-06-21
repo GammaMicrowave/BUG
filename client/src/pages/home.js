@@ -3,8 +3,23 @@ import Profile from "@/components/home/Profile";
 import UploadPost from "@/components/home/UploadPost";
 import Post from "@/components/home/Post";
 import ListOfUsers from "@/components/home/ListOfUsers";
+import { getSelfData } from "@/API/user.api";
+import { dehydrate, QueryClient, useQuery } from "react-query";
 
 import React from "react";
+
+export async function getServerSideProps({ req, res }) {
+  const queryClient = new QueryClient();
+  const token = req.cookies["jwt_token"];
+  await queryClient.prefetchQuery(["selfData"], () => getSelfData(token), {
+    staleTime: 1000 * 60 * 30,
+  });
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+    },
+  };
+}
 
 function home() {
   return (

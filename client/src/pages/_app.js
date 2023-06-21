@@ -7,11 +7,9 @@ import { ThemeProvider } from "@mui/material/styles";
 import ThemeContext from "@/contexts/theme.context";
 import Navbar from "@/components/Navbar";
 import Container from "@mui/material/Container";
-import { QueryClientProvider, QueryClient } from "react-query";
+import { QueryClientProvider, QueryClient, Hydrate } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { SnackbarProvider } from "notistack";
-
-const queryClient = new QueryClient();
 
 function conditionalWrapper(condition, Parent, parentProps, Children) {
   if (condition) {
@@ -21,6 +19,7 @@ function conditionalWrapper(condition, Parent, parentProps, Children) {
 }
 
 export default function App({ Component, pageProps }) {
+  const [queryClient] = useState(() => new QueryClient());
   let [mode, setMode] = useState("dark");
   let theme = useMemo(() => getTheme(mode), [mode]);
 
@@ -32,28 +31,30 @@ export default function App({ Component, pageProps }) {
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
-          <ThemeProvider theme={theme}>
-            <SnackbarProvider maxSnack={3}>
-              <Navbar />
-              <Container
-                // maxWidth="xl"
-                maxWidth={false}
-                sx={{
-                  bgcolor: "background.default",
-                  minHeight: "calc(100vh - 64px)",
-                  display: "flex",
-                  flexDirection: "column",
-                  flexGrow: 1,
-                  p: 3,
-                }}
-              >
-                <Component {...pageProps} />
-              </Container>
-            </SnackbarProvider>
-          </ThemeProvider>
-        </ThemeContext.Provider>
-        <ReactQueryDevtools initialIsOpen={false} />
+        <Hydrate state={pageProps.dehydratedState}>
+          <ThemeContext.Provider value={{ theme, toggleTheme }}>
+            <ThemeProvider theme={theme}>
+              <SnackbarProvider maxSnack={3}>
+                <Navbar />
+                <Container
+                  // maxWidth="xl"
+                  maxWidth={false}
+                  sx={{
+                    bgcolor: "background.default",
+                    minHeight: "calc(100vh - 64px)",
+                    display: "flex",
+                    flexDirection: "column",
+                    flexGrow: 1,
+                    p: 3,
+                  }}
+                >
+                  <Component {...pageProps} />
+                </Container>
+              </SnackbarProvider>
+            </ThemeProvider>
+          </ThemeContext.Provider>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </Hydrate>
       </QueryClientProvider>
     </>
   );
