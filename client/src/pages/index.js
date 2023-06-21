@@ -1,17 +1,7 @@
-import Image from "next/image";
+
+
 import { Inter } from "next/font/google";
-import {
-  setCookie,
-  getCookie,
-  getCookies,
-  hasCookie,
-  deleteCookie,
-} from "cookies-next";
-
-import Navbar from "@/components/Navbar";
-
-const inter = Inter({ subsets: ["latin"] });
-
+import { test } from "@/API/test.api";
 export default function Home({ isLoggedIn }) {
   return (
     <>
@@ -24,8 +14,12 @@ export default function Home({ isLoggedIn }) {
   );
 }
 
-export const getServerSideProps = ({ req, res }) => {
+export const getServerSideProps = async ({ req, res }) => {
   const isLoggedIn = req.cookies["jwt_token"] ? true : false;
+
+  // const token = req.cookies["jwt_token"];
+  // console.log(token);
+  // const data = await test(token);
   return {
     props: {
       isLoggedIn,
