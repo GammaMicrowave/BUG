@@ -1,4 +1,4 @@
-import { Inter } from "next/font/google";
+
 import { test } from "@/API/test.api";
 export default function Home({ isLoggedIn }) {
   return (
@@ -14,8 +14,6 @@ export default function Home({ isLoggedIn }) {
 
 export const getServerSideProps = async ({ req, res }) => {
   const isLoggedIn = req.cookies["jwt_token"] ? true : false;
-  const token = req.cookies["jwt_token"];
-  const data = await test(token);
   return {
     props: {
       isLoggedIn,

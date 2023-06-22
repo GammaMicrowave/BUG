@@ -30,6 +30,7 @@ export async function signUpUser({
 export async function signInUser({ email, password }) {
   let res = await post("/auth/signin", { email, password });
   if (res.status === 200) {
+    console.log(res);
     // cookieCutter.set("jwt_token", res.data.token);
     return Promise.resolve(res.data.data);
   } else {

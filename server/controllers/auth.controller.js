@@ -24,7 +24,7 @@ export async function signUp(req, res) {
     if (image) {
       imageUrl = await uploadImage(image);
     }
-    
+
     const salt = await bcrypt.genSalt(16);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -45,7 +45,6 @@ export async function signUp(req, res) {
       },
       process.env.JWT_SECRET
     );
-
     return response_200(res, "User created", { token });
   } catch (error) {
     return response_500(res, "Server Error", error);

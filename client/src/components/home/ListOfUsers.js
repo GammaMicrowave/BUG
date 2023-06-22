@@ -1,26 +1,14 @@
 import { ManageAccountsOutlined } from "@mui/icons-material";
-import { Avatar, Box, Divider, Typography } from "@mui/material";
+import { Avatar, Box, Divider, IconButton, Typography } from "@mui/material";
 import React from "react";
+// import { getFollowersList } from "@/API/user.api";
+// import { useQuery } from "react-query";
 
-function ListOfUsers({ heading }) {
-  const userList = [
-    {
-      firstName: "John",
-      lastName: "Doe",
-      followers: [],
-    },
-    {
-      firstName: "John",
-      lastName: "Doe",
-      followers: [],
-    },
-    {
-      firstName: "John",
-      lastName: "Doe",
-      followers: [],
-    },
-  ];
+function ListOfUsers({ heading, followersListQuery, followingListQuery }) {
+  const userList =
+    followersListQuery?.data?.followers || followingListQuery?.data?.following;
 
+  
   return (
     <Box
       className="w-full rounded-md py-4"
@@ -36,13 +24,14 @@ function ListOfUsers({ heading }) {
       >
         {heading}
       </Typography>
+
       {userList.map((user, index) => (
         <>
           <Box
             className="flex justify-between items-center p-4"
             gap="0.5rem"
             pb="1.1rem"
-            onClick={() => navigate(`/profile/${userId}`)}
+            onClick={() => navigate(`/profile/${user.id}`)}
             sx={{
               "&:hover": {
                 cursor: "pointer",
@@ -51,17 +40,19 @@ function ListOfUsers({ heading }) {
             }}
           >
             <div className="flex justify-between items-center gap-[1rem]">
-              <Avatar src={"https://mui.com/static/images/avatar/1.jpg"} />
+              <Avatar src={user.image} />
               <Box>
                 <Typography variant="h4" color="neutral.dark" fontWeight="500">
-                  {user.firstName} {user.lastName}
+                  {user.name}
                 </Typography>
                 <Typography color="neutral.main">
-                  {user.followers.length} followers
+                  {user._count.followers} followers
                 </Typography>
               </Box>
             </div>
-            <ManageAccountsOutlined sx={{ color: "neutral.main" }} />
+            <IconButton>
+              <ManageAccountsOutlined sx={{ color: "neutral.main" }} />
+            </IconButton>
           </Box>
           <Divider />
         </>

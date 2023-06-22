@@ -19,7 +19,18 @@ function conditionalWrapper(condition, Parent, parentProps, Children) {
 }
 
 export default function App({ Component, pageProps }) {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 1000 * 60 * 30,
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+          },
+        },
+      })
+  );
   let [mode, setMode] = useState("dark");
   let theme = useMemo(() => getTheme(mode), [mode]);
 

@@ -5,7 +5,7 @@ import cors from "cors";
 import morgan from "morgan";
 import routes from "./routes/index.js";
 import PrismaInit from "./config/sql.config.js";
-
+import cookieParser from "cookie-parser";
 dotenv.config();
 
 const app = express();
@@ -19,6 +19,7 @@ app.use(
     extended: false,
   })
 );
+app.use(cookieParser());
 app.use(morgan("dev"));
 app.use("/api", routes);
 
