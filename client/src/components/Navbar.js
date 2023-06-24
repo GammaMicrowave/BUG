@@ -165,11 +165,11 @@ function ResponsiveAppBar() {
             >
               <ChatIcon />
             </IconButton>
-            <IconButton className="mr-2">
+            <IconButton className="mr-2" onClick={toggleTheme}>
               {theme.palette.mode === "dark" ? (
-                <DarkModeIcon onClick={toggleTheme} />
+                <DarkModeIcon />
               ) : (
-                <LightModeIcon onClick={toggleTheme} />
+                <LightModeIcon />
               )}
             </IconButton>
             {isLoggedIn ? (

@@ -165,6 +165,7 @@ function Profile({ selfDataQuery }) {
 
         {user.otherProfiles.map((profile) => (
           <Box
+            key={profile.id}
             className="flex justify-between items-center gap-4 mb-2 p-2"
             sx={{
               "&:hover": {

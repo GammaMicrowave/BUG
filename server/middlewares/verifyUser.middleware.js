@@ -7,13 +7,13 @@ export async function verifyUser(req, res, next) {
   if (!token) return response_401(res, "JWT Token is missing");
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await prisma.user.findUnique({
-      where: {
-        id: decoded.id,
-      },
-    });
-    if (!user) return response_401(res, "User not found");
-    req.user = user;
+    // const user = await prisma.user.findUnique({
+    //   where: {
+    //     id: decoded.id,
+    //   },
+    // });
+    // if (!user) return response_401(res, "User not found");
+    req.user = decoded;
     next();
   } catch (err) {
     return response_500(res, err);

@@ -8,7 +8,6 @@ function ListOfUsers({ heading, followersListQuery, followingListQuery }) {
   const userList =
     followersListQuery?.data?.followers || followingListQuery?.data?.following;
 
-  
   return (
     <Box
       className="w-full rounded-md py-4"
@@ -28,6 +27,7 @@ function ListOfUsers({ heading, followersListQuery, followingListQuery }) {
       {userList.map((user, index) => (
         <>
           <Box
+            key={user.id}
             className="flex justify-between items-center p-4"
             gap="0.5rem"
             pb="1.1rem"
