@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -29,6 +29,9 @@ model User {
   location      String?                     @default("")
   occupation    String?                     @default("")
   viewedProfile Int                         @default(0)
+  message       Message[]
+  chats         Chat[]                      @relation("Users") //All the chats user is in.
+  adminChats    Chat[]                      @relation("Admins") //All the chats user is admin of.
 
   @@index([email])
 }
@@ -52,5 +55,32 @@ model Post {
   authorId  String
   author    User      @relation(fields: [authorId], references: [id])
 
+  @@index([authorId])
+}
+
+model Chat {
+  id          String    @id @default(uuid())
+  chatName    String    @default("")
+  isGroupChat Boolean   @default(false)
+  users       User[]    @relation("Users") //All the users in the group.
+  groupAdmins User[]    @relation("Admins") //All the admins of the group.
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  messages    Message[] @relation("Messages") //All the messages in the chat.
+
+  @@index([chatName])
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  chatId    String
+  authorId  String
+  chat      Chat     @relation("Messages", fields: [chatId], references: [id]) //The chat the message is in.
+  author    User     @relation(fields: [authorId], references: [id])
+
+  @@index([chatId])
   @@index([authorId])
 }

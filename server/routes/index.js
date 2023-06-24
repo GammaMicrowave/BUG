@@ -6,12 +6,14 @@ import {
   getFollowersList,
 } from "../controllers/user.controller.js";
 import userRoutes from "./user.routes.js";
+import chatRoutes from "./chat.routes.js";
 import { response_200 } from "../utils/responseCodes.js";
 var router = Router();
 
 router.use("/auth", authRoutes);
 router.get("/", verifyUser, getFollowersList);
 router.use("/user", verifyUser, userRoutes);
+router.use("/chat", verifyUser, chatRoutes);
 function greet(req, res) {
   return response_200(res, "Hello World");
 }
