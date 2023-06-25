@@ -41,6 +41,7 @@ export async function getServerSideProps({ req, res }) {
   );
 
   await Promise.all(promises);
+
   return {
     props: {
       dehydratedState: dehydrate(queryClient),
@@ -48,7 +49,6 @@ export async function getServerSideProps({ req, res }) {
         token,
       },
     },
-    // revalidate: 60,
   };
 }
 
@@ -85,7 +85,7 @@ function home({ pageProps: { token } }) {
           </Box>
         </Box>
         <Box
-          className="hidden lg:flex basis-1/4 justify-center items-start p-4 rounded-md h-fit sticky top-4"
+          className="hidden lg:flex basis-1/4 justify-center items-start p-4 rounded-md h-fit sticky top-20"
           sx={{ bgcolor: "background.alt" }}
         >
           <Profile selfDataQuery={selfDataQuery} />

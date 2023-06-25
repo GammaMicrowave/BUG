@@ -21,7 +21,7 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 import ChatIcon from "@mui/icons-material/Chat";
 import cookieCutter from "cookie-cutter";
 import { useRouter } from "next/router";
-const pages = ["Home", "Pricing", "Blog"];
+const pages = ["Home", "Chat", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function ResponsiveAppBar({ openDrawer, setOpenDrawer }) {
@@ -68,6 +68,7 @@ function ResponsiveAppBar({ openDrawer, setOpenDrawer }) {
       position="fixed"
       sx={{
         bgcolor: theme.palette.background.default,
+        color: theme.palette.text.primary,
         zIndex: 1400,
         height: 64,
       }}

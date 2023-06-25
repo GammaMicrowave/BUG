@@ -99,7 +99,7 @@ export async function fetchAllChats(req, res) {
         },
         messages: {
           orderBy: {
-            createdAt: "desc",
+            createdAt: "asc",
           },
           select: {
             id: true,
@@ -142,7 +142,13 @@ export async function getChat(req, res) {
         id: true,
         chatName: true,
         isGroupChat: true,
-        users: true,
+        users: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
         groupAdmins: true,
         messages: {
           orderBy: {
@@ -152,6 +158,13 @@ export async function getChat(req, res) {
             id: true,
             content: true,
             createdAt: true,
+            author: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
           },
         },
       },
@@ -160,6 +173,14 @@ export async function getChat(req, res) {
       return response_400(res, "No chat found");
     }
     chat.isAdmin = chat.groupAdmins.includes(user.id);
+
+    chat.messages = chat.messages.map((message) => {
+      return {
+        ...message,
+        isMine: message.author.id === user.id,
+      };
+    });
+
     return response_200(res, "Chat fetched successfully", chat);
   } catch (err) {
     return response_500(res, err);
@@ -168,7 +189,7 @@ export async function getChat(req, res) {
 
 export async function getPrivateChat(req, res) {
   const user = req.user;
-  const otherUserId = req.params.otheruserdId;
+  const otherUserId = req.params.otherUserId;
   if (!otherUserId) {
     return response_400(res, "Please provide a valid user id");
   }
@@ -280,8 +301,6 @@ export async function createGroupChat(req, res) {
   if (users.length < 2) {
     return response_400(res, "Please select atleast 2 users");
   }
-  //users only have id
-  //eg : users = ['abcd-egh', 'abcd-egh']
   try {
     const newGroupChat = await prisma.chat.create({
       data: {

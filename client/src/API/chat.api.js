@@ -9,8 +9,8 @@ export async function getAllUsers({ q, token = null }) {
   }
 }
 
-export async function createGroupChat({ name, users, token = null }) {
-  let res = await post("/chat/group", { name, users }, token);
+export async function createGroupChat({ chatName, users, token = null }) {
+  let res = await post("/chat/group", { chatName, users }, token);
   if (res.status === 200) {
     return Promise.resolve(res.data.data);
   } else {

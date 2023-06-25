@@ -58,7 +58,7 @@ export const getTheme = (mode) => {
             // palette values for light mode
             primary: {
               dark: colorTokens.primary[700],
-              main: colorTokens.primary[500],
+              main: colorTokens.primary[600],
               light: colorTokens.primary[50],
             },
             neutral: {
@@ -69,8 +69,8 @@ export const getTheme = (mode) => {
               light: colorTokens.grey[50],
             },
             background: {
-              default: colorTokens.grey[10],
-              alt: colorTokens.grey[0],
+              default: colorTokens.grey[100],
+              alt: colorTokens.grey[10],
             },
           }),
     },

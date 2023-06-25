@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
+  CircularProgress,
   Container,
   IconButton,
   Paper,
@@ -11,10 +12,37 @@ import {
 import LeftMessage from "@/components/chat/LeftMessage";
 import RightMessage from "@/components/chat/RightMessage";
 import { Attachment } from "@mui/icons-material";
+import { dehydrate, QueryClient, useQuery } from "react-query";
+import { getChat } from "@/API/chat.api";
 
-function IndividualChat() {
+export async function getServerSideProps({ req, res, params }) {
+  const queryClient = new QueryClient();
+  const token = req.cookies["jwt_token"];
+  const chatId = params.chatId;
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+      pageProps: {
+        token,
+        chatId,
+      },
+    },
+  };
+}
+
+function IndividualChat({ pageProps: { token, chatId } }) {
+  const queryClient = new QueryClient();
+
+  const { data: chatData, isLoading } = useQuery(["chat", chatId], () =>
+    getChat({ chatId, token })
+  );
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-64px)] w-full">
+        <CircularProgress />
+      </div>
+    );
   return (
-    // <Container>
     <Box
       sx={{
         height: "calc(100vh - 64px)",
@@ -34,32 +62,28 @@ function IndividualChat() {
               <div className="flex flex-col h-full overflow-x-auto mb-4">
                 <div className="flex flex-col h-full">
                   <div className="grid grid-cols-12 gap-y-2">
-                    <LeftMessage
-                      avatar={
-                        "https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/male/45.png"
-                      }
-                      message={"Hey How are you today?"}
-                    />
-                    <RightMessage
-                      avatar={
-                        "https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/male/45.png"
-                      }
-                      message={"I'm ok what about you?"}
-                    />
-                    <LeftMessage
-                      avatar={
-                        "https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/male/45.png"
-                      }
-                      message={"I'm fine"}
-                    />
-                    <RightMessage
-                      avatar={
-                        "https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/male/45.png"
-                      }
-                      message={
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing el it, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip"
-                      }
-                    />
+                    {chatData && chatData.messages.length > 0
+                      ? chatData.messages.map((message) => {
+                          if (message.isMine) {
+                            return (
+                              <RightMessage
+                                avatar={message.author.image}
+                                message={message.content}
+                                author={message.author.name}
+                                createdAt={message.createdAt}
+                              />
+                            );
+                          }
+                          return (
+                            <LeftMessage
+                              avatar={message.author.image}
+                              author={message.author.name}
+                              createdAt={message.createdAt}
+                              message={message.content}
+                            />
+                          );
+                        })
+                      : null}
                   </div>
                 </div>
               </div>
