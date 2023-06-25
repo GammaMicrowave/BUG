@@ -10,6 +10,7 @@ import Container from "@mui/material/Container";
 import { QueryClientProvider, QueryClient, Hydrate } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { SnackbarProvider } from "notistack";
+import Drawer from "@/components/SideDrawer.js";
 
 function conditionalWrapper(condition, Parent, parentProps, Children) {
   if (condition) {
@@ -33,6 +34,7 @@ export default function App({ Component, pageProps }) {
   );
   let [mode, setMode] = useState("dark");
   let theme = useMemo(() => getTheme(mode), [mode]);
+  const [open, setOpen] = useState(false);
 
   function toggleTheme() {
     storeLS("mode", mode === "dark" ? "light" : "dark", true);
@@ -46,7 +48,17 @@ export default function App({ Component, pageProps }) {
           <ThemeContext.Provider value={{ theme, toggleTheme }}>
             <ThemeProvider theme={theme}>
               <SnackbarProvider maxSnack={3}>
-                <Navbar />
+                {Component.showDrawer && (
+                  <Drawer open={open} setOpen={setOpen} />
+                )}
+                {!Component.showDrawer && (
+                  <Drawer
+                    open={open}
+                    setOpen={setOpen}
+                    showOnlyTemporary={true}
+                  />
+                )}
+                <Navbar openDrawer={open} setOpenDrawer={setOpen} />
                 <Container
                   // maxWidth="xl"
                   maxWidth={false}
@@ -56,8 +68,17 @@ export default function App({ Component, pageProps }) {
                     display: "flex",
                     flexDirection: "column",
                     flexGrow: 1,
-                    p: 3,
+                    padding: Component.noPadding ? 0 : 3,
+                    mt: 8,
                   }}
+                  className={`ml-0 w-full ${
+                    Component.showDrawer ? "md:ml-[240px] p-0" : ""
+                  }
+                  ${
+                    Component.showDrawer
+                      ? "md:w-[calc(100%-240px)]"
+                      : "md:w-full"
+                  }`}
                 >
                   <Component {...pageProps} />
                 </Container>

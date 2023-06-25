@@ -47,6 +47,7 @@ export async function getAllUsers(req, res) {
 
 export async function fetchAllChats(req, res) {
   const user = req.user;
+  const q = req.query.q;
   try {
     const chats = await prisma.chat.findMany({
       where: {
@@ -55,6 +56,31 @@ export async function fetchAllChats(req, res) {
             id: user.id,
           },
         },
+        OR: [
+          {
+            chatName: {
+              contains: q,
+            },
+          },
+          {
+            users: {
+              some: {
+                AND: [
+                  {
+                    name: {
+                      contains: q,
+                    },
+                  },
+                  {
+                    NOT: {
+                      id: user.id,
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
       },
       select: {
         id: true,
@@ -98,7 +124,51 @@ export async function fetchAllChats(req, res) {
 
 export async function getChat(req, res) {
   const user = req.user;
-  const otherUserId = req.body.id;
+  const chatId = req.params.chatId;
+  if (!chatId) {
+    return response_400(res, "Please provide a valid chat id");
+  }
+  try {
+    let chat = await prisma.chat.findFirst({
+      where: {
+        id: chatId,
+        users: {
+          some: {
+            id: user.id,
+          },
+        },
+      },
+      select: {
+        id: true,
+        chatName: true,
+        isGroupChat: true,
+        users: true,
+        groupAdmins: true,
+        messages: {
+          orderBy: {
+            createdAt: "desc",
+          },
+          select: {
+            id: true,
+            content: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+    if (!chat) {
+      return response_400(res, "No chat found");
+    }
+    chat.isAdmin = chat.groupAdmins.includes(user.id);
+    return response_200(res, "Chat fetched successfully", chat);
+  } catch (err) {
+    return response_500(res, err);
+  }
+}
+
+export async function getPrivateChat(req, res) {
+  const user = req.user;
+  const otherUserId = req.params.otheruserdId;
   if (!otherUserId) {
     return response_400(res, "Please provide a valid user id");
   }
@@ -119,6 +189,9 @@ export async function getChat(req, res) {
                 id: otherUserId,
               },
             },
+          },
+          {
+            isGroupChat: false,
           },
         ],
       },
@@ -255,7 +328,8 @@ export async function createGroupChat(req, res) {
 
 export async function renameGroupChat(req, res) {
   const user = req.user;
-  const { chatId, chatName } = req.body;
+  const chatId = req.params.chatId;
+  const { chatName } = req.body;
 
   try {
     const { count } = await prisma.chat.updateMany({
@@ -293,7 +367,8 @@ export async function renameGroupChat(req, res) {
 
 export async function addUserToGroupChat(req, res) {
   const user = req.user;
-  const { chatId, userId } = req.body;
+  const chatId = req.params.chatId;
+  const { userId } = req.body;
 
   try {
     const { count } = await prisma.chat.updateMany({
@@ -334,7 +409,8 @@ export async function addUserToGroupChat(req, res) {
 
 export async function removeUserFromGroupChat(req, res) {
   const user = req.user;
-  const { chatId, userId } = req.body;
+  const chatId = req.params.chatId;
+  const { userId } = req.body;
   try {
     const { count } = await prisma.chat.updateMany({
       where: {
@@ -374,7 +450,8 @@ export async function removeUserFromGroupChat(req, res) {
 
 export async function makeUserAdminOfGroupChat(req, res) {
   const user = req.user;
-  const { chatId, userId } = req.body;
+  const chatId = req.params.chatId;
+  const { userId } = req.body;
   try {
     const { count } = await prisma.chat.updateMany({
       where: {
@@ -411,48 +488,3 @@ export async function makeUserAdminOfGroupChat(req, res) {
     return response_500(res, err);
   }
 }
-
-//For Testing purposes
-
-// setTimeout(async () => {
-//   await fetchAllChats(
-//     {
-//       user: {
-//         id: "fb4d4e2b-850b-4702-aef8-1c126f12f654",
-//       },
-//       //   body: {
-//       //     id: "a1840f31-a920-4e09-852a-91a149c839a8",
-//       //   },
-//     },
-//     {
-//       send: console.log,
-//     }
-//   );
-//   await createGroupChat(
-//     {
-//       user: {
-//         id: "fb4d4e2b-850b-4702-aef8-1c126f12f654",
-//       },
-//       body: {
-//         chatName: "Group Chat2",
-//         users: [
-//           "3fa2ef5e-97f5-4344-8283-07252c91d8fd",
-//           "83bdd87a-d5c6-4ecf-b378-33535ea92eb4",
-//           "a1840f31-a920-4e09-852a-91a149c839a8",
-//         ],
-//       },
-//     },
-//     {
-//       send: console.log,
-//     }
-//   );
-//   await renameGroupChat({
-//     user: {
-//       id: "fb4d4e2b-850b-4702-aef8-1c126f12f654",
-//     },
-//     body: {
-//       chatId: "4f9dde7c-1788-4d57-9148-c44bb27b91b6",
-//       chatName: "Renamed Group Chat",
-//     },
-//   });
-// }, 1000);

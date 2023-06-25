@@ -23,7 +23,8 @@ import cookieCutter from "cookie-cutter";
 import { useRouter } from "next/router";
 const pages = ["Home", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
-function ResponsiveAppBar() {
+
+function ResponsiveAppBar({ openDrawer, setOpenDrawer }) {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   useEffect(() => {
@@ -64,10 +65,13 @@ function ResponsiveAppBar() {
 
   return (
     <AppBar
-      position="static"
+      position="fixed"
       sx={{
         bgcolor: theme.palette.background.default,
+        zIndex: 1400,
+        height: 64,
       }}
+      className="flex justify-center items-center"
     >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
@@ -162,6 +166,10 @@ function ResponsiveAppBar() {
                 color: "inherit",
               }}
               className="m-2"
+              onClick={() => {
+                setOpenDrawer(!openDrawer);
+                console.log("clicked");
+              }}
             >
               <ChatIcon />
             </IconButton>
