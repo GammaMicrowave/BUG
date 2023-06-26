@@ -5,6 +5,8 @@ import {
 } from "../utils/responseCodes.js";
 import { prisma } from "../config/sql.config.js";
 
+import { io } from "../config/socket.config.js";
+
 export async function getAllUsers(req, res) {
   const q = req.query.q;
   const user = req.user;
@@ -99,7 +101,7 @@ export async function fetchAllChats(req, res) {
         },
         messages: {
           orderBy: {
-            createdAt: "asc",
+            createdAt: "desc",
           },
           select: {
             id: true,
@@ -114,6 +116,10 @@ export async function fetchAllChats(req, res) {
           },
           take: 1,
         },
+      },
+
+      orderBy: {
+        updatedAt: "asc",
       },
     });
     return response_200(res, "Chats fetched successfully", chats);
@@ -152,7 +158,7 @@ export async function getChat(req, res) {
         groupAdmins: true,
         messages: {
           orderBy: {
-            createdAt: "desc",
+            createdAt: "asc",
           },
           select: {
             id: true,
@@ -180,6 +186,8 @@ export async function getChat(req, res) {
         isMine: message.author.id === user.id,
       };
     });
+
+    io.to(user.id).socketsJoin(chatId);
 
     return response_200(res, "Chat fetched successfully", chat);
   } catch (err) {
@@ -502,6 +510,53 @@ export async function makeUserAdminOfGroupChat(req, res) {
       res,
       "You are not admin of this group or chat not found"
     );
+  } catch (err) {
+    console.log(err);
+    return response_500(res, err);
+  }
+}
+
+export async function addMessage(req, res) {
+  const user = req.user;
+  const chatId = req.params.chatId;
+  const { message } = req.body;
+  try {
+    const newMessage = await prisma.message.create({
+      data: {
+        content: message,
+        author: {
+          connect: {
+            id: user.id,
+          },
+        },
+        chat: {
+          connect: {
+            id: chatId,
+          },
+        },
+      },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        chatId: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+      },
+    });
+    newMessage.isMine = true;
+    io.to(user.id).emit("newMessage", newMessage);
+
+    // console.log(Object.keys(io.sockets.sockets));
+
+    io.in(chatId).emit("newMessage", { ...newMessage, isMine: false });
+
+    return response_200(res, "Message sent successfully", newMessage);
   } catch (err) {
     console.log(err);
     return response_500(res, err);

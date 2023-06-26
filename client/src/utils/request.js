@@ -1,15 +1,8 @@
 import axios from "axios";
-// import { getLS, removeLS } from "../localStorage";
-// import cookieCutter from "cookie-cutter";
 
 const API_URL = process.env.API_URL || "http://localhost:8080/api";
 
-// const getAccessToken = () => getLS("jwt_token");
-// const getAccessToken = () => cookieCutter.get("jwt_token") || null;
-
 const getHeaders = (token, params) => {
-  // if (!token) token = getAccessToken();
-  // if (!token) token = cookieCutter.get("jwt_token") || null;
   if (token) {
     return {
       headers: {

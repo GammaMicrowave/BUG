@@ -88,3 +88,12 @@ export async function makeUserAdminOfGroupChat({
     return Promise.reject(res);
   }
 }
+
+export async function addMessage({ chatId, message, token = null }) {
+  let res = await post(`/chat/${chatId}/message`, { message }, token);
+  if (res.status === 200) {
+    return Promise.resolve(res.data.data);
+  } else {
+    return Promise.reject(res);
+  }
+}

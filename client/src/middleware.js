@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 export function middleware(request) {
-  const isLoggedIn = request.cookies.get("jwt_token").value ? true : false;
+  const isLoggedIn = request.cookies.get("jwt_token")?.value ? true : false;
   const url = request.nextUrl.clone();
   if (isLoggedIn) {
     if (

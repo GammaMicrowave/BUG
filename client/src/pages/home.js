@@ -1,4 +1,4 @@
-import { Box, Container } from "@mui/material";
+import { Box, CircularProgress, Container } from "@mui/material";
 import Profile from "@/components/home/Profile";
 import UploadPost from "@/components/home/UploadPost";
 import Post from "@/components/home/Post";
@@ -8,60 +8,79 @@ import {
   getFollowersList,
   getFollowingList,
 } from "@/API/user.api";
-import { dehydrate, QueryClient, useQuery } from "react-query";
+import { dehydrate, QueryClient, useQuery, useQueries } from "react-query";
 
 import React from "react";
 
 export async function getServerSideProps({ req, res }) {
-  const queryClient = new QueryClient();
+  // const queryClient = new QueryClient();
   const token = req.cookies["jwt_token"];
-  const promises = [];
-  promises.push(
-    queryClient.prefetchQuery(["selfData"], () => getSelfData(token), {
-      staleTime: 1000 * 60 * 30,
-    })
-  );
-  promises.push(
-    queryClient.prefetchQuery(
-      ["followersList"],
-      () => getFollowersList(token),
-      {
-        staleTime: 1000 * 60 * 30,
-      }
-    )
-  );
-  promises.push(
-    queryClient.prefetchQuery(
-      ["followingList"],
-      () => getFollowingList(token),
-      {
-        staleTime: 1000 * 60 * 30,
-      }
-    )
-  );
+  // const promises = [];
+  // promises.push(
+  //   queryClient.prefetchQuery(["selfData"], () => getSelfData(token), {
+  //     staleTime: 1000 * 60 * 30,
+  //   })
+  // );
+  // promises.push(
+  //   queryClient.prefetchQuery(
+  //     ["followersList"],
+  //     () => getFollowersList(token),
+  //     {
+  //       staleTime: 1000 * 60 * 30,
+  //     }
+  //   )
+  // );
+  // promises.push(
+  //   queryClient.prefetchQuery(
+  //     ["followingList"],
+  //     () => getFollowingList(token),
+  //     {
+  //       staleTime: 1000 * 60 * 30,
+  //     }
+  //   )
+  // );
 
-  await Promise.all(promises);
+  // await Promise.all(promises);
 
   return {
     props: {
-      dehydratedState: dehydrate(queryClient),
-      pageProps: {
-        token,
-      },
+      // dehydratedState: dehydrate(queryClient),
+      token,
     },
   };
 }
 
-function home({ pageProps: { token } }) {
-  const selfDataQuery = useQuery(["selfData"], () => getSelfData(token));
+function home({ token }) {
+  const [selfDataQuery, followersListQuery, followingListQuery] = useQueries([
+    {
+      queryKey: ["selfData"],
+      queryFn: () => getSelfData(token),
+    },
+    {
+      queryKey: ["followersList"],
+      queryFn: () => getFollowersList(token),
+    },
+    {
+      queryKey: ["followingList"],
+      queryFn: () => getFollowingList(token),
+    },
+  ]);
 
-  const followersListQuery = useQuery(["followersList"], () =>
-    getFollowersList(token)
-  );
-
-  const followingListQuery = useQuery(["followingList"], () =>
-    getFollowingList(token)
-  );
+  if (
+    selfDataQuery.isLoading ||
+    followersListQuery.isLoading ||
+    followingListQuery.isLoading
+  ) {
+    return (
+      <Container
+        maxWidth={false}
+        className="flex justify-center items-center"
+        sx={{ height: "calc(100vh-64px)" }}
+      >
+        <CircularProgress />
+      </Container>
+    );
+  }
 
   return (
     <>

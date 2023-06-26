@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Button,
   CircularProgress,
   Container,
   IconButton,
+  List,
+  ListItem,
   Paper,
   TextField,
   Typography,
@@ -12,8 +14,14 @@ import {
 import LeftMessage from "@/components/chat/LeftMessage";
 import RightMessage from "@/components/chat/RightMessage";
 import { Attachment } from "@mui/icons-material";
-import { dehydrate, QueryClient, useQuery } from "react-query";
-import { getChat } from "@/API/chat.api";
+import {
+  dehydrate,
+  useQueryClient,
+  QueryClient,
+  useQuery,
+  useMutation,
+} from "react-query";
+import { getChat, addMessage } from "@/API/chat.api";
 
 export async function getServerSideProps({ req, res, params }) {
   const queryClient = new QueryClient();
@@ -31,11 +39,40 @@ export async function getServerSideProps({ req, res, params }) {
 }
 
 function IndividualChat({ pageProps: { token, chatId } }) {
-  const queryClient = new QueryClient();
+  const queryClient = useQueryClient();
+  const bottomRef = useRef(null);
 
   const { data: chatData, isLoading } = useQuery(["chat", chatId], () =>
     getChat({ chatId, token })
   );
+
+  const [message, setMessage] = useState("");
+
+  const addMessageMutation = useMutation((message) => addMessage(message), {
+    onSuccess: (data) => {
+      // const prevData = queryClient.getQueryData(["chat", chatId]);
+      // queryClient.setQueryData(["chat", chatId], {
+      //   ...prevData,
+      //   messages: [...prevData.messages, data],
+      // });
+      //this is now done in the socket event in _app.js for real time updates
+    },
+  });
+  const handleAddMessage = () => {
+    if (message.trim() === "") return;
+
+    addMessageMutation.mutate({
+      chatId,
+      token,
+      message,
+    });
+    setMessage("");
+  };
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatData]);
+
   if (isLoading)
     return (
       <div className="flex justify-center items-center h-[calc(100vh-64px)] w-full">
@@ -59,7 +96,7 @@ function IndividualChat({ pageProps: { token, chatId } }) {
               }}
               className="flex flex-col flex-auto flex-shrink-0 h-full p-4"
             >
-              <div className="flex flex-col h-full overflow-x-auto mb-4">
+              <div className="flex h-full overflow-x-auto mb-4 flex-col" s>
                 <div className="flex flex-col h-full">
                   <div className="grid grid-cols-12 gap-y-2">
                     {chatData && chatData.messages.length > 0
@@ -67,6 +104,7 @@ function IndividualChat({ pageProps: { token, chatId } }) {
                           if (message.isMine) {
                             return (
                               <RightMessage
+                                key={message.id}
                                 avatar={message.author.image}
                                 message={message.content}
                                 author={message.author.name}
@@ -76,6 +114,7 @@ function IndividualChat({ pageProps: { token, chatId } }) {
                           }
                           return (
                             <LeftMessage
+                              key={message.id}
                               avatar={message.author.image}
                               author={message.author.name}
                               createdAt={message.createdAt}
@@ -84,6 +123,7 @@ function IndividualChat({ pageProps: { token, chatId } }) {
                           );
                         })
                       : null}
+                    <div ref={bottomRef} />
                   </div>
                 </div>
               </div>
@@ -98,10 +138,23 @@ function IndividualChat({ pageProps: { token, chatId } }) {
                   <Attachment />
                 </IconButton>
 
-                <TextField size="small" className="w-full flex-grow ml-4" />
+                <TextField
+                  size="small"
+                  className="w-full flex-grow ml-4"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleAddMessage();
+                  }}
+                />
 
                 <div className="ml-4">
-                  <Button variant="contained" color="primary" className="h-8">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    className="h-8"
+                    onClick={handleAddMessage}
+                  >
                     Send
                   </Button>
                 </div>
@@ -111,7 +164,6 @@ function IndividualChat({ pageProps: { token, chatId } }) {
         </div>
       </Box>
     </Box>
-    // {/* </Container> */}
   );
 }
 

@@ -18,52 +18,6 @@ import { fetchAllChats } from "@/API/chat.api";
 import CircularProgress from "@mui/material/CircularProgress";
 import CreateGroupChatModal from "./chat/CreateGroupChatModal";
 
-const chats = [
-  {
-    id: 1,
-    user: {
-      name: "John Doe",
-      id: 1,
-      image:
-        "https://images.unsplash.com/photo-1633960358570-4b0b0b0b0b0b?ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzNnx8fGVufDB8fHx8&ixlib=rb-1.2.1&w=1000&q=80",
-    },
-    lastMessage: {
-      content: "Hello",
-      createdAt: "2021-10-10T12:00:00.000Z",
-    },
-    isGroupChat: false,
-  },
-  {
-    id: 2,
-    user: {
-      name: "Jane Doe",
-      id: 2,
-      image:
-        "https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/male/45.png",
-    },
-    lastMessage: {
-      content: "Hello, how ohwofh owhef oiweh foiweh foiwehf oifweh",
-      createdAt: "2021-10-10T12:00:00.000Z",
-    },
-    isGroupChat: false,
-  },
-  {
-    id: 3,
-    user: {
-      name: "John Doe",
-      id: 1,
-    },
-    lastMessage: {
-      content: "Hello",
-      createdAt: "2021-10-10T12:00:00.000Z",
-    },
-    isGroupChat: true,
-    groupImage:
-      "https://w7.pngwing.com/pngs/574/369/png-transparent-avatar-computer-icons-user-random-icons-purple-blue-heroes.png",
-    chatName: "Group Chat",
-  },
-];
-
 const drawerWidth = 240;
 
 function ResponsiveDrawer(props) {

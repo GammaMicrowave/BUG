@@ -6,6 +6,7 @@ import morgan from "morgan";
 import routes from "./routes/index.js";
 import PrismaInit from "./config/sql.config.js";
 import cookieParser from "cookie-parser";
+import { socketInit } from "./config/socket.config.js";
 dotenv.config();
 
 const app = express();
@@ -25,7 +26,7 @@ app.use("/api", routes);
 
 PrismaInit()
   .then(() => {
-    app.listen(
+    const server = app.listen(
       process.env.PORT ? process.env.PORT : 8080,
       process.env.HOST ? process.env.HOST : "127.0.0.1",
       console.log(
@@ -34,6 +35,8 @@ PrismaInit()
         }/`
       )
     );
+
+    socketInit(server);
   })
   .catch((err) => {
     console.log(err);

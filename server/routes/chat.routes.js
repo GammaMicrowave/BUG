@@ -9,6 +9,7 @@ import {
   makeUserAdminOfGroupChat,
   removeUserFromGroupChat,
   renameGroupChat,
+  addMessage,
 } from "../controllers/chat.controller.js";
 
 const chatRouter = Router();
@@ -22,5 +23,6 @@ chatRouter.post("/:chatId/add-user", addUserToGroupChat);
 chatRouter.post("/:chatId/remove-user", removeUserFromGroupChat);
 chatRouter.patch("/:chatId/rename", renameGroupChat);
 chatRouter.patch("/:chatId/add-admin", makeUserAdminOfGroupChat);
+chatRouter.post("/:chatId/message", addMessage);
 
 export default chatRouter;
