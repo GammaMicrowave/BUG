@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
+import { CssBaseline } from "@mui/material";
 
-import { useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import { storeLS } from "@/utils/localStorage";
 import { getTheme } from "@/config/theme.config.js";
 import { ThemeProvider } from "@mui/material/styles";
@@ -18,9 +19,12 @@ import { SnackbarProvider } from "notistack";
 import Drawer from "@/components/SideDrawer.js";
 import cookieCutter, { set } from "cookie-cutter";
 import io from "socket.io-client";
-import { API_URL } from "@/config/contants.config";
+import { socketInit } from "@/config/socket.config.js";
 import { useRouter } from "next/router";
 import { enqueueSnackbar } from "notistack";
+import { socketNewMessage } from "@/API/socket.api";
+
+let socket;
 
 function conditionalWrapper(condition, Parent, parentProps, Children) {
   if (condition) {
@@ -58,45 +62,8 @@ export default function App({ Component, pageProps }) {
     const token = cookieCutter.get("jwt_token");
     setIsLoggedIn(!!token);
     if (token) {
-      const socket = io(API_URL, {
-        auth: {
-          token,
-        },
-      });
-      socket.on("connect", () => {
-        // console.log("connected");
-      });
-      socket.on("disconnect", () => {
-        // console.log("disconnected");
-      });
-
-      socket.on("newMessage", (data) => {
-        const chatId = router.query.chatId;
-        const prevData = queryClient.getQueryData(["chat", chatId]);
-        if (prevData) {
-          //check if the message is already in the cache
-          const lastMessage = prevData.messages[prevData.messages.length - 1];
-          if (lastMessage?.id !== data.id) {
-            queryClient.setQueryData(["chat", chatId], {
-              ...prevData,
-              messages: [...prevData.messages, data],
-            });
-
-            //update last message in chats list
-            const prevChats = queryClient.getQueryData(["fetchAllChats"]);
-            if (prevChats) {
-              const updatedChats = prevChats.map((chat) => {
-                if (chat.id === chatId) {
-                  chat.messages[0] = data;
-                  return chat;
-                }
-                return chat;
-              });
-              queryClient.setQueryData(["fetchAllChats"], updatedChats);
-            }
-          }
-        }
-      });
+      if (!socket) socket = socketInit(token);
+      socketNewMessage(socket, queryClient);
     }
   });
 
@@ -106,6 +73,7 @@ export default function App({ Component, pageProps }) {
         <Hydrate state={pageProps.dehydratedState}>
           <ThemeContext.Provider value={{ theme, toggleTheme }}>
             <ThemeProvider theme={theme}>
+              <CssBaseline />
               <SnackbarProvider maxSnack={3}>
                 {Component.showDrawer && isLoggedIn && (
                   <Drawer open={open} setOpen={setOpen} />

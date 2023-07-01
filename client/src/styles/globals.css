@@ -15,13 +15,13 @@
   /* 2 */
   border-style: solid;
   /* 2 */
-  border-color: theme('borderColor.DEFAULT', currentColor);
+  border-color: theme("borderColor.DEFAULT", currentColor);
   /* 2 */
 }
 
 ::before,
 ::after {
-  --tw-content: '';
+  --tw-content: "";
 }
 
 /*
@@ -120,7 +120,17 @@ code,
 kbd,
 samp,
 pre {
-  font-family: theme('fontFamily.mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
+  font-family: theme(
+    "fontFamily.mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    "Liberation Mono",
+    "Courier New",
+    monospace
+  );
   /* 1 */
   font-size: 1em;
   /* 2 */
@@ -241,7 +251,7 @@ Correct the cursor style of increment and decrement buttons in Safari.
 2. Correct the outline style in Safari.
 */
 
-[type='search'] {
+[type="search"] {
   -webkit-appearance: textfield;
   /* 1 */
   outline-offset: -2px;
@@ -330,7 +340,7 @@ input::placeholder,
 textarea::placeholder {
   opacity: 1;
   /* 1 */
-  color: theme('colors.gray.400', #9ca3af);
+  color: theme("colors.gray.400", #9ca3af);
   /* 2 */
 }
 
@@ -390,10 +400,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 /*  add new font from ttf file */
 @font-face {
-  font-family: 'Chasing';
+  font-family: "Chasing";
   font-style: normal;
   font-weight: 400;
-  src: url('/chasing.ttf') format('truetype');
+  src: url("/chasing.ttf") format("truetype");
 }
 
 @keyframes rotate {
@@ -422,7 +432,7 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 ::-webkit-scrollbar-thumb {
   border-radius: 4px;
-  background-color: #617C8B;
+  background-color: #617c8b;
 }
 
 .content ol {

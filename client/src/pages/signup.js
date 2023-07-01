@@ -112,7 +112,7 @@ function signup() {
               setData({ ...data, confirmPassword: e.target.value })
             }
           />
-          <FileUpload files={files} setFiles={setFiles} helperText={Add a Profile Picture} />
+          <FileUpload files={files} setFiles={setFiles} helperText={"Add a Profile Picture"} />
 
           <LoadingButton
             loading={isLoading}

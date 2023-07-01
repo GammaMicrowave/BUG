@@ -17,9 +17,10 @@ export const socketInit = (server) => {
     if (!decoded) return socket.disconnect(true);
     const userId = decoded.id;
     socket.join(userId);
+    console.log("user connected", socket.client.conn.server.clientsCount);
     socket.emit(userId, "You are successfully connected privately");
     socket.on("disconnect", () => {
-      // console.log("user disconnected", socket.client.conn.server.clientsCount);
+      console.log("user disconnected", socket.client.conn.server.clientsCount);
     });
   });
 };

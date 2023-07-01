@@ -13,6 +13,7 @@ import { dehydrate, QueryClient, useQuery, useQueries } from "react-query";
 import React from "react";
 
 export async function getServerSideProps({ req, res }) {
+  // const time = new Date().getTime();
   // const queryClient = new QueryClient();
   const token = req.cookies["jwt_token"];
   // const promises = [];
@@ -41,7 +42,7 @@ export async function getServerSideProps({ req, res }) {
   // );
 
   // await Promise.all(promises);
-
+  // console.log("time taken", new Date().getTime() - time + "ms");
   return {
     props: {
       // dehydratedState: dehydrate(queryClient),
