@@ -42,7 +42,6 @@ function ResponsiveAppBar({ openDrawer, setOpenDrawer }) {
   };
 
   const handleCloseNavMenu = (e) => {
-    // console.log(e.target.innerText);
     const page = e.target.innerText.toLowerCase();
     router.push(`/${page}`);
     setAnchorElNav(null);
@@ -52,7 +51,6 @@ function ResponsiveAppBar({ openDrawer, setOpenDrawer }) {
     setAnchorElUser(null);
   };
   const handleAccount = () => {
-    console.log("Account");
     handleCloseUserMenu();
   };
   const handleLogout = () => {
@@ -169,7 +167,6 @@ function ResponsiveAppBar({ openDrawer, setOpenDrawer }) {
               className="m-2"
               onClick={() => {
                 setOpenDrawer(!openDrawer);
-                console.log("clicked");
               }}
             >
               <ChatIcon />

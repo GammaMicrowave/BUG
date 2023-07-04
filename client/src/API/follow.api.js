@@ -39,7 +39,6 @@ export async function removeFollower({ id, token = null }) {
 }
 
 export async function removeFollowing({ id, token = null }) {
-  console.log(id, token);
   let res = await post("/follow/remove-following", { id }, token);
   if (res.status === 200) {
     return Promise.resolve(res.data.data);

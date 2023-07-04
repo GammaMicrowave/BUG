@@ -5,6 +5,7 @@ import Post from "@/components/home/Post";
 import ListOfUsers from "@/components/home/ListOfUsers";
 import { getSelfData } from "@/API/user.api";
 import { getFollowersList, getFollowingList } from "@/API/follow.api.js";
+import { getAllPosts } from "@/API/post.api";
 import { dehydrate, QueryClient, useQuery, useQueries } from "react-query";
 
 import React from "react";
@@ -49,25 +50,31 @@ export async function getServerSideProps({ req, res }) {
 }
 
 function home({ token }) {
-  const [selfDataQuery, followersListQuery, followingListQuery] = useQueries([
-    {
-      queryKey: ["selfData"],
-      queryFn: () => getSelfData(token),
-    },
-    {
-      queryKey: ["followersList"],
-      queryFn: () => getFollowersList(token),
-    },
-    {
-      queryKey: ["followingList"],
-      queryFn: () => getFollowingList(token),
-    },
-  ]);
+  const [selfDataQuery, followersListQuery, followingListQuery, postListQuery] =
+    useQueries([
+      {
+        queryKey: ["selfData"],
+        queryFn: () => getSelfData(token),
+      },
+      {
+        queryKey: ["followersList"],
+        queryFn: () => getFollowersList(token),
+      },
+      {
+        queryKey: ["followingList"],
+        queryFn: () => getFollowingList(token),
+      },
+      {
+        queryKey: ["posts"],
+        queryFn: () => getAllPosts(token),
+      },
+    ]);
 
   if (
     selfDataQuery.isLoading ||
     followersListQuery.isLoading ||
-    followingListQuery.isLoading
+    followingListQuery.isLoading ||
+    postListQuery.isLoading
   ) {
     return (
       <Container
@@ -109,8 +116,11 @@ function home({ token }) {
         </Box>
         <Box className="flex-grow basis-1/2 flex flex-col gap-4">
           <UploadPost />
-          <Post />
-          <Post />
+          {/* <Post />
+          <Post /> */}
+          {postListQuery.data.map((post) => (
+            <Post key={post.id} author={post.author} post={post} />
+          ))}
         </Box>
         <Box className="hidden lg:flex basis-1/4 justify-start items-center flex-col w-full gap-4">
           <ListOfUsers

@@ -73,7 +73,6 @@ export async function removeFollower(req, res) {
 export async function removeFollowing(req, res) {
   const userId = req.user.id;
   const followingId = req.body.id;
-  console.log(userId, followingId);
   try {
     const following = await prisma.user.findUnique({
       where: {

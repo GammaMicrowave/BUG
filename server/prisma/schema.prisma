@@ -47,8 +47,8 @@ model otherProfilesUserRelation {
 
 model Post {
   id        String    @id @default(uuid())
-  title     String
-  content   String
+  image     String?
+  content   String    @db.VarChar(1000)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?

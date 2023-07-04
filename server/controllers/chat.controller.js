@@ -429,7 +429,6 @@ export async function addUserToGroupChat(req, res) {
       "You are not admin of this group or chat not found"
     );
   } catch (err) {
-    console.log(err);
     return response_500(res, err);
   }
 }
@@ -511,7 +510,6 @@ export async function makeUserAdminOfGroupChat(req, res) {
       "You are not admin of this group or chat not found"
     );
   } catch (err) {
-    console.log(err);
     return response_500(res, err);
   }
 }
@@ -558,7 +556,6 @@ export async function addMessage(req, res) {
 
     return response_200(res, "Message sent successfully", newMessage);
   } catch (err) {
-    console.log(err);
     return response_500(res, err);
   }
 }

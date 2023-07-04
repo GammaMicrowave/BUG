@@ -1,11 +1,45 @@
 import { Box, Icon, IconButton, TextField, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import FileUpload from "../FileUpload";
 import { useState } from "react";
 import SendIcon from "@mui/icons-material/Send";
+import { useMutation, useQueryClient } from "react-query";
+import { addPost } from "@/API/post.api";
+import cookieCutter, { set } from "cookie-cutter";
+import { enqueueSnackbar } from "notistack";
 
 function UploadPost() {
   const [files, setFiles] = useState([]);
+
+  const [content, setContent] = useState("");
+  const [token, setToken] = useState("");
+
+  useEffect(() => {
+    setToken(cookieCutter.get("jwt_token"));
+  }, []);
+
+  const queryClient = useQueryClient();
+
+  const createPostMutation = useMutation(addPost, {
+    onSuccess: (data) => {
+      const prevData = queryClient.getQueryData(["posts"]);
+      const newPosts = [data, ...prevData];
+      queryClient.setQueryData(["posts"], newPosts);
+      setContent("");
+      setFiles([]);
+    },
+  });
+
+  const handleNewPost = () => {
+    if (content == "" && files.length == 0) {
+      enqueueSnackbar("Please enter some content or upload an image", {
+        variant: "error",
+      });
+      return;
+    }
+    createPostMutation.mutate({ content, image: files, token });
+  };
+
   return (
     <>
       <Box
@@ -22,6 +56,8 @@ function UploadPost() {
             variant="outlined"
             placeholder="What do you want to talk about?"
             className="flex-grow"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
           />
           <IconButton
             aria-label="send"
@@ -33,6 +69,7 @@ function UploadPost() {
               },
             }}
             className="rounded-full h-12 w-12 mx-2"
+            onClick={handleNewPost}
           >
             <SendIcon />
           </IconButton>
