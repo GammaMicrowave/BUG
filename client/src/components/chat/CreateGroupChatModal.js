@@ -5,6 +5,7 @@ import { get } from "../../utils/request";
 import cookieCutter from "cookie-cutter";
 import { useMutation, useQueryClient } from "react-query";
 import { createGroupChat } from "@/API/chat.api";
+import { enqueueSnackbar } from "notistack";
 
 function CreateGroupChatModal({ open, setOpen, token }) {
   const queryClient = useQueryClient();
@@ -22,7 +23,9 @@ function CreateGroupChatModal({ open, setOpen, token }) {
       handleClose();
     },
     onError: (err) => {
-      console.log(err);
+      enqueueSnackbar(err.data.error, {
+        variant: "error",
+      });
     },
   });
 

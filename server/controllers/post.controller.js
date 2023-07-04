@@ -67,11 +67,28 @@ export async function getAllPosts(req, res) {
             id: true,
             name: true,
             image: true,
+            followers: {
+              where: {
+                id: req.user.id,
+              },
+              select: {
+                id: true,
+              },
+            },
           },
         },
       },
     });
-    return response_200(res, "Posts fetched successfully", posts);
+
+    const finalPosts = posts.map((post) => {
+      if (post.author.id === req.user.id) {
+        post.isMine = true;
+      } else {
+        post.isMine = false;
+      }
+      return post;
+    });
+    return response_200(res, "Posts fetched successfully", finalPosts);
   } catch (err) {
     return response_500(res, err);
   }

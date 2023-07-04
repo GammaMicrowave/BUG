@@ -22,13 +22,13 @@ model User {
   createdAt     DateTime                    @default(now())
   updatedAt     DateTime                    @updatedAt
   deletedAt     DateTime?
+  location      String?                     @default("")
+  occupation    String?                     @default("")
+  viewedProfile Int                         @default(0)
   posts         Post[]
   otherProfiles otherProfilesUserRelation[]
   following     User[]                      @relation("UserToUser")
   followers     User[]                      @relation("UserToUser")
-  location      String?                     @default("")
-  occupation    String?                     @default("")
-  viewedProfile Int                         @default(0)
   message       Message[]
   chats         Chat[]                      @relation("Users") //All the chats user is in.
   adminChats    Chat[]                      @relation("Admins") //All the chats user is admin of.

@@ -1,5 +1,6 @@
 import { response_200, response_500 } from "../utils/responseCodes.js";
 import { prisma } from "../config/sql.config.js";
+import { uploadImage } from "../utils/image.js";
 
 export async function getUserData(req, res) {
   const userId = req.user.id;
@@ -91,5 +92,95 @@ export async function updateProfileLink(req, res) {
     );
   } catch (err) {
     return response_500(res, err);
+  }
+}
+
+export async function updateProfile(req, res) {
+  const userId = req.user.id;
+  const { name, bio, location, occupation } = req.body;
+  console.log(req.body);
+  const image = req.file;
+  try {
+    if (image) {
+      const newImage = await uploadImage(image);
+      const updatedUser = await prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          name,
+          bio,
+          location,
+          occupation,
+          image: newImage,
+        },
+        select: {
+          id: true,
+          name: true,
+          bio: true,
+          image: true,
+          email: true,
+          location: true,
+          occupation: true,
+          createdAt: true,
+          updatedAt: true,
+          viewedProfile: true,
+          otherProfiles: {
+            select: {
+              otherProfileLink: true,
+            },
+          },
+          _count: {
+            select: {
+              followers: true,
+              following: true,
+              posts: true,
+            },
+          },
+        },
+      });
+      console.log(updatedUser);
+      return response_200(res, "Profile updated successfully", updatedUser);
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        name,
+        bio,
+        location,
+        occupation,
+      },
+      select: {
+        id: true,
+        name: true,
+        bio: true,
+        image: true,
+        email: true,
+        location: true,
+        occupation: true,
+        createdAt: true,
+        updatedAt: true,
+        viewedProfile: true,
+        otherProfiles: {
+          select: {
+            otherProfileLink: true,
+          },
+        },
+        _count: {
+          select: {
+            followers: true,
+            following: true,
+            posts: true,
+          },
+        },
+      },
+    });
+    console.log(updatedUser);
+    return response_200(res, "Profile updated successfully", updatedUser);
+  } catch (err) {
+    response_500(res, err);
   }
 }

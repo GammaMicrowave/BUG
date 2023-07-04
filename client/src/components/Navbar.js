@@ -23,13 +23,31 @@ import cookieCutter from "cookie-cutter";
 import { useRouter } from "next/router";
 const pages = ["Home", "Chat", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
+import { useQuery, useQueryClient } from "react-query";
+import { getSelfData } from "@/API/user.api";
 
 function ResponsiveAppBar({ openDrawer, setOpenDrawer }) {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const queryClient = useQueryClient();
+  const [token, setToken] = React.useState("");
+  const [user, setUser] = React.useState(null);
   useEffect(() => {
     setIsLoggedIn(cookieCutter.get("jwt_token") ? true : false);
+    setToken((prev) => cookieCutter.get("jwt_token"));
   }, []);
+
+  // if (isLoggedIn) {
+  const { data, isLoading, isError } = useQuery(["selfData"], getSelfData, {
+    onSuccess: (data) => {
+      setUser(data);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+    enabled: isLoggedIn,
+  });
+  // }
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   let { theme, toggleTheme } = useContext(ThemeContext);
@@ -182,10 +200,7 @@ function ResponsiveAppBar({ openDrawer, setOpenDrawer }) {
               <>
                 <Tooltip title="Open settings">
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar
-                      alt="Remy Sharp"
-                      src="/static/images/avatar/2.jpg"
-                    />
+                    <Avatar alt="Remy Sharp" src={user?.image} />
                   </IconButton>
                 </Tooltip>
 

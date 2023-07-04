@@ -20,7 +20,7 @@ export async function getFollowingList(token = null) {
 }
 
 export async function addFollower({ id, token = null }) {
-  let res = await PostAddRounded("/follow/add-follower", { id }, token);
+  let res = await post("/follow/add-follower", { id }, token);
   if (res.status === 200) {
     return Promise.resolve(res.data.data);
   } else {
@@ -31,6 +31,15 @@ export async function addFollower({ id, token = null }) {
 export async function removeFollower({ id, token = null }) {
   console.log(id, token);
   let res = await post("/follow/remove-follower", { id }, token);
+  if (res.status === 200) {
+    return Promise.resolve(res.data.data);
+  } else {
+    return Promise.reject(res);
+  }
+}
+
+export async function addFollowing({ id, token = null }) {
+  let res = await post("/follow/add-following", { id }, token);
   if (res.status === 200) {
     return Promise.resolve(res.data.data);
   } else {

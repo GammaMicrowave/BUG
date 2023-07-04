@@ -35,3 +35,23 @@ export async function updateProfileLink(data, token = null) {
     return Promise.reject(res);
   }
 }
+
+export async function updateProfile({ data, files, token = null }) {
+  const formData = new FormData();
+  for (let key in data) {
+    formData.append(key, data[key]);
+  }
+  console.log(formData);
+  let imageBlob = null;
+  if (files.length != 0) {
+    imageBlob = await (await fetch(files[0].src)).blob();
+  }
+
+  formData.append("image", imageBlob);
+
+  let res = await update("/user", formData, token);
+  if (res.status === 200) {
+    return Promise.resolve(res.data.data);
+  }
+  return Promise.reject(res);
+}

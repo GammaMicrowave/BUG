@@ -19,12 +19,22 @@ export async function addFollower(req, res) {
     }
     const user = await prisma.user.update({
       where: {
-        id: userId,
+        id: followerId,
       },
       data: {
         following: {
           connect: {
-            id: followerId,
+            id: userId,
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        _count: {
+          select: {
+            following: true,
           },
         },
       },
@@ -49,10 +59,10 @@ export async function removeFollower(req, res) {
     }
     const user = await prisma.user.update({
       where: {
-        id: userId,
+        id: followerId,
       },
       data: {
-        followers: {
+        following: {
           disconnect: {
             id: followerId,
           },
@@ -65,6 +75,54 @@ export async function removeFollower(req, res) {
     return response_200(res, "Follower removed successfully", {
       id: followerId,
     });
+  } catch (err) {
+    return response_500(res, err);
+  }
+}
+
+export async function addFollowing(req, res) {
+  const userId = req.user.id;
+  const followingId = req.body.id;
+  try {
+    const following = await prisma.user.findUnique({
+      where: {
+        id: followingId,
+      },
+    });
+    if (!following) {
+      return response_400(res, "Person not found");
+    }
+    const user = await prisma.user.update({
+      where: {
+        id: followingId,
+      },
+      data: {
+        followers: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        _count: {
+          select: {
+            following: true,
+          },
+        },
+        followers: {
+          where: {
+            id: userId,
+          },
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    return response_200(res, "Following added successfully", user);
   } catch (err) {
     return response_500(res, err);
   }
