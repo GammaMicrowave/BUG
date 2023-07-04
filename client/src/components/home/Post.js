@@ -1,10 +1,18 @@
 import { ManageAccountsOutlined } from "@mui/icons-material";
-import { Avatar, Box, Divider, IconButton, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Divider,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import Image from "next/image";
 import React from "react";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import CommentIcon from "@mui/icons-material/Comment";
 import ShareIcon from "@mui/icons-material/Share";
+import PersonAddAltRoundedIcon from "@mui/icons-material/PersonAddAltRounded";
 
 function Post() {
   const firstName = "John",
@@ -45,7 +53,11 @@ function Post() {
             <Typography color="neutral.main">{date}</Typography>
           </Box>
         </div>
-        <ManageAccountsOutlined sx={{ color: "neutral.main" }} />
+        <Tooltip title="Follow" placement="left">
+          <IconButton>
+            <PersonAddAltRoundedIcon sx={{ color: "neutral.main" }} />
+          </IconButton>
+        </Tooltip>
       </div>
 
       <Divider className="mb-2" />
@@ -58,16 +70,22 @@ function Post() {
       <Divider className="mt-2" />
       <Box className="flex justify-between items-center gap-4 px-2">
         <div className="flex gap-2">
-          <IconButton>
-            <FavoriteBorderIcon />
-          </IconButton>
-          <IconButton>
-            <CommentIcon />
-          </IconButton>
+          <Tooltip title="Like" placement="top">
+            <IconButton>
+              <FavoriteBorderIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Comment" placement="top">
+            <IconButton>
+              <CommentIcon />
+            </IconButton>
+          </Tooltip>
         </div>
-        <IconButton>
-          <ShareIcon />
-        </IconButton>
+        <Tooltip title="Share" placement="left">
+          <IconButton>
+            <ShareIcon />
+          </IconButton>
+        </Tooltip>
       </Box>
     </Box>
   );

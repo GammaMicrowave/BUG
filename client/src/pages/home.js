@@ -3,11 +3,8 @@ import Profile from "@/components/home/Profile";
 import UploadPost from "@/components/home/UploadPost";
 import Post from "@/components/home/Post";
 import ListOfUsers from "@/components/home/ListOfUsers";
-import {
-  getSelfData,
-  getFollowersList,
-  getFollowingList,
-} from "@/API/user.api";
+import { getSelfData } from "@/API/user.api";
+import { getFollowersList, getFollowingList } from "@/API/follow.api.js";
 import { dehydrate, QueryClient, useQuery, useQueries } from "react-query";
 
 import React from "react";

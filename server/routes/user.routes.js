@@ -1,8 +1,6 @@
 import { Router } from "express";
 import {
   getUserData,
-  getFollowersList,
-  getFollowingList,
   addNewProfileLink,
   deleteProfileLink,
   updateProfileLink,
@@ -11,8 +9,6 @@ import {
 const userRouter = Router();
 
 userRouter.get("/", getUserData);
-userRouter.get("/followers", getFollowersList);
-userRouter.get("/following", getFollowingList);
 userRouter.post("/profile-link", addNewProfileLink);
 userRouter.delete("/profile-link", deleteProfileLink);
 userRouter.patch("/profile-link", updateProfileLink);
