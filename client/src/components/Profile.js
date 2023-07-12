@@ -1,5 +1,4 @@
 import {
-  EditOutlined,
   LocationOnOutlined,
   ManageAccountsOutlined,
   WorkOutlineOutlined,
@@ -13,21 +12,21 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import {
-  getSelfData,
-  addNewProfileLink,
-  deleteProfileLink,
-  updateProfileLink,
-} from "@/API/user.api";
-import { useQuery, useQueryClient, useMutation } from "react-query";
-import UpdateProfile from "./UpdateProfileForm";
+import { deleteProfileLink } from "@/API/user.api";
+import { useQueryClient, useMutation } from "react-query";
+import UpdateProfile from "./home/UpdateProfileForm";
 import Link from "next/link";
-import ProfileLinkModal from "./ProfileLinkModal";
+import ProfileLinkModal from "./home/ProfileLinkModal";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 import cookieCutter from "cookie-cutter";
+import { addFollowing, removeFollowing } from "@/API/follow.api";
+import { enqueueSnackbar } from "notistack";
+import PersonAddAltRoundedIcon from "@mui/icons-material/PersonAddAltRounded";
+import PersonRemoveRoundedIcon from "@mui/icons-material/PersonRemoveRounded";
+import { CircularProgress } from "@mui/material";
 
-function Profile({ selfDataQuery }) {
+function Profile({ selfDataQuery, isMine }) {
   const queryClient = useQueryClient();
   const [token, setToken] = useState("");
   useEffect(() => {
@@ -36,6 +35,10 @@ function Profile({ selfDataQuery }) {
   }, []);
   const [openModal, setOpenModal] = useState(false);
   const [openNewLinkModal, setOpenNewLinkModal] = useState(false);
+  const [disableButton, setDisableButton] = useState(false);
+  const [canFollow, setCanFollow] = useState(
+    selfDataQuery.data.followers?.length === 0
+  );
 
   const deleteProfileLinkMutation = useMutation(deleteProfileLink, {
     onSuccess: (data) => {
@@ -49,6 +52,67 @@ function Profile({ selfDataQuery }) {
       });
     },
   });
+
+  const addFollowMutation = useMutation(addFollowing, {
+    onSuccess: (data) => {
+      const prevData = queryClient.getQueryData(["followingList"]);
+      const newData = {
+        following: [...prevData.following, data],
+      };
+      queryClient.setQueryData(["followingList"], newData);
+
+      let prevData2 = queryClient.getQueryData(["posts"]);
+      prevData2.map((post) => {
+        if (post.author.id === data.id) {
+          post.author.followers.push(data.followers[0]);
+        }
+      });
+
+      queryClient.setQueryData(["posts"], prevData2);
+      setCanFollow(false);
+      setDisableButton(false);
+    },
+    onError: (err) => {
+      enqueueSnackbar(err.data.error, {
+        variant: "error",
+      });
+      setDisableButton(false);
+    },
+  });
+  const removeFollowMutation = useMutation(removeFollowing, {
+    onSuccess: (data) => {
+      const prevData = queryClient.getQueryData(["followingList"]);
+      const newData = {
+        following: prevData.following.filter((item) => item.id !== data.id),
+      };
+      queryClient.setQueryData(["followingList"], newData);
+
+      let prevData2 = queryClient.getQueryData(["posts"]);
+      prevData2.map((post) => {
+        if (post.author.id === data.id) {
+          post.author.followers.pop();
+        }
+      });
+      queryClient.setQueryData(["posts"], prevData2);
+      setCanFollow(true);
+      setDisableButton(false);
+    },
+    onError: (err) => {
+      enqueueSnackbar(err.data.error, {
+        variant: "error",
+      });
+      setDisableButton(false);
+    },
+  });
+
+  const handleFollow = () => {
+    setDisableButton(true);
+    if (!canFollow) {
+      removeFollowMutation.mutate({ token, id: selfDataQuery.data.id });
+    } else {
+      addFollowMutation.mutate({ token, id: selfDataQuery.data.id });
+    }
+  };
 
   const user = selfDataQuery.data;
   return (
@@ -82,14 +146,26 @@ function Profile({ selfDataQuery }) {
               </Typography>
             </Box>
           </div>
-          <Tooltip title="Account Settings" placement="left">
-            <IconButton>
-              <ManageAccountsOutlined
-                sx={{ color: "neutral.main" }}
-                onClick={() => setOpenModal(true)}
-              />
+          {isMine ? (
+            <Tooltip title="Account Settings" placement="left">
+              <IconButton>
+                <ManageAccountsOutlined
+                  sx={{ color: "neutral.main" }}
+                  onClick={() => setOpenModal(true)}
+                />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <IconButton onClick={handleFollow} disabled={disableButton}>
+              {disableButton ? (
+                <CircularProgress size={18} />
+              ) : !canFollow ? (
+                <PersonRemoveRoundedIcon sx={{ color: "neutral.main" }} />
+              ) : (
+                <PersonAddAltRoundedIcon sx={{ color: "neutral.main" }} />
+              )}
             </IconButton>
-          </Tooltip>
+          )}
         </div>
         <Box
           // p="0.5rem 1rem"
@@ -154,11 +230,13 @@ function Profile({ selfDataQuery }) {
             >
               Other Profiles
             </Typography>
-            <Tooltip title="Add Profile" placement="left">
-              <IconButton onClick={() => setOpenNewLinkModal(true)}>
-                <AddRoundedIcon sx={{ color: "neutral.main" }} />
-              </IconButton>
-            </Tooltip>
+            {isMine && (
+              <Tooltip title="Add Profile" placement="left">
+                <IconButton onClick={() => setOpenNewLinkModal(true)}>
+                  <AddRoundedIcon sx={{ color: "neutral.main" }} />
+                </IconButton>
+              </Tooltip>
+            )}
           </Box>
           {user.otherProfiles.map((profile) => (
             <Box

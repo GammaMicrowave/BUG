@@ -1,5 +1,5 @@
 import { Box, CircularProgress, Container } from "@mui/material";
-import Profile from "@/components/home/Profile";
+import Profile from "@/components/Profile";
 import UploadPost from "@/components/home/UploadPost";
 import Post from "@/components/Post";
 import ListOfUsers from "@/components/home/ListOfUsers";
@@ -98,7 +98,7 @@ function home({ token }) {
             className="flex justify-center items-center p-4 rounded-md"
             sx={{ bgcolor: "background.alt" }}
           >
-            <Profile selfDataQuery={selfDataQuery} />
+            <Profile selfDataQuery={selfDataQuery} isMine={true} />
           </Box>
           <Box className="justify-start items-center flex flex-col w-full gap-4">
             <ListOfUsers
@@ -115,7 +115,7 @@ function home({ token }) {
           className="hidden lg:flex basis-1/4 justify-center items-start p-4 rounded-md h-fit sticky top-20"
           sx={{ bgcolor: "background.alt" }}
         >
-          <Profile selfDataQuery={selfDataQuery} />
+          <Profile selfDataQuery={selfDataQuery} isMine={true} />
         </Box>
         <Box className="flex-grow basis-1/2 flex flex-col gap-4">
           <UploadPost />

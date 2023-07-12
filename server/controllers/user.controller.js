@@ -41,6 +41,7 @@ export async function getUserData(req, res) {
   }
 }
 
+
 export async function addNewProfileLink(req, res) {
   const userId = req.user.id;
   const { otherProfileLink } = req.body;
