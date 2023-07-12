@@ -23,6 +23,7 @@ export async function getUserData(req, res) {
         otherProfiles: {
           select: {
             otherProfileLink: true,
+            id: true,
           },
         },
         _count: {
@@ -44,7 +45,7 @@ export async function addNewProfileLink(req, res) {
   const userId = req.user.id;
   const { otherProfileLink } = req.body;
   try {
-    const newProfileLink = await prisma.otherProfiles.create({
+    const newProfileLink = await prisma.otherProfilesUserRelation.create({
       data: {
         otherProfileLink,
         userId,
@@ -58,8 +59,9 @@ export async function addNewProfileLink(req, res) {
 
 export async function deleteProfileLink(req, res) {
   const { profileLinkId } = req.body;
+  console.log(profileLinkId);
   try {
-    const deletedProfileLink = await prisma.otherProfiles.delete({
+    const deletedProfileLink = await prisma.otherProfilesUserRelation.delete({
       where: {
         id: profileLinkId,
       },
@@ -77,7 +79,7 @@ export async function deleteProfileLink(req, res) {
 export async function updateProfileLink(req, res) {
   const { profileLinkId, otherProfileLink } = req.body;
   try {
-    const updatedProfileLink = await prisma.otherProfiles.update({
+    const updatedProfileLink = await prisma.otherProfilesUserRelation.update({
       where: {
         id: profileLinkId,
       },
@@ -178,7 +180,6 @@ export async function updateProfile(req, res) {
         },
       },
     });
-    console.log(updatedUser);
     return response_200(res, "Profile updated successfully", updatedUser);
   } catch (err) {
     response_500(res, err);

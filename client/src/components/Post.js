@@ -20,6 +20,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { addFollowing, removeFollowing } from "@/API/follow.api";
 import cookieCutter, { set } from "cookie-cutter";
 import { enqueueSnackbar } from "notistack";
+import Link from "next/link";
 
 function Post({ post, author }) {
   // console.log(post);
@@ -83,7 +84,7 @@ function Post({ post, author }) {
 
   const handleFollow = () => {
     setDisableButton(true);
-    if (author.followers.length > 0) {
+    if (author?.followers?.length > 0) {
       console.log("remove");
       removeFollowMutation.mutate({ token, id: author.id });
     } else {
@@ -104,20 +105,22 @@ function Post({ post, author }) {
         <div className="flex justify-between items-center gap-[1rem]">
           <Avatar src={author.image} />
           <Box>
-            <Typography
-              variant="h4"
-              color="neutral.dark"
-              fontWeight="500"
-              sx={{
-                "&:hover": {
-                  color: "neutral.light",
-                  cursor: "pointer",
-                },
-              }}
-              onClick={() => navigate(`/profile/${userId}`)}
-            >
-              {author.name}
-            </Typography>
+            <Link href={`/profile/${author.id}`}>
+              <Typography
+                variant="h4"
+                color="neutral.dark"
+                fontWeight="500"
+                sx={{
+                  "&:hover": {
+                    color: "primary.main",
+                    cursor: "pointer",
+                  },
+                }}
+                // onClick={() => navigate(`/profile/${author.id}`)}
+              >
+                {author.name}
+              </Typography>
+            </Link>
             <Typography color="neutral.main">
               {moment(post.createdAt).fromNow()}
             </Typography>
@@ -128,15 +131,15 @@ function Post({ post, author }) {
           //   title="Follow"
           //   placement="left"
           // >
-            <IconButton onClick={handleFollow} disabled={disableButton}>
-              {disableButton ? (
-                <CircularProgress size={18} />
-              ) : author.followers.length > 0 ? (
-                <PersonRemoveRoundedIcon sx={{ color: "neutral.main" }} />
-              ) : (
-                <PersonAddAltRoundedIcon sx={{ color: "neutral.main" }} />
-              )}
-            </IconButton>
+          <IconButton onClick={handleFollow} disabled={disableButton}>
+            {disableButton ? (
+              <CircularProgress size={18} />
+            ) : author.followers.length > 0 ? (
+              <PersonRemoveRoundedIcon sx={{ color: "neutral.main" }} />
+            ) : (
+              <PersonAddAltRoundedIcon sx={{ color: "neutral.main" }} />
+            )}
+          </IconButton>
           // </Tooltip>
         )}
       </div>

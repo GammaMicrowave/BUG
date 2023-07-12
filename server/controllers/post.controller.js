@@ -44,6 +44,7 @@ export async function addPost(req, res) {
         },
       },
     });
+    post.isMine = true;
     console.log(post);
     return response_200(res, "Post added successfully", post);
   } catch (err) {

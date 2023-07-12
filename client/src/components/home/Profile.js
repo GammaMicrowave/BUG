@@ -12,7 +12,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   getSelfData,
   addNewProfileLink,
@@ -21,42 +21,31 @@ import {
 } from "@/API/user.api";
 import { useQuery, useQueryClient, useMutation } from "react-query";
 import UpdateProfile from "./UpdateProfileForm";
-
+import Link from "next/link";
+import ProfileLinkModal from "./ProfileLinkModal";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
+import cookieCutter from "cookie-cutter";
 
 function Profile({ selfDataQuery }) {
   const queryClient = useQueryClient();
+  const [token, setToken] = useState("");
+  useEffect(() => {
+    const jwt = cookieCutter.get("jwt_token");
+    setToken(jwt);
+  }, []);
   const [openModal, setOpenModal] = useState(false);
-  const addProfileLinkMutation = useMutation(addNewProfileLink, {
-    onSuccess: (data) => {
-      const oldData = queryClient.getQueryData("selfData");
-      queryClient.setQueryData("selfData", {
-        ...oldData,
-        otherProfiles: [...oldData.otherProfiles, data],
-      });
-    },
-  });
+  const [openNewLinkModal, setOpenNewLinkModal] = useState(false);
 
   const deleteProfileLinkMutation = useMutation(deleteProfileLink, {
-    onSuccess: () => {
+    onSuccess: (data) => {
       const oldData = queryClient.getQueryData("selfData");
+      const newLinks = oldData.otherProfiles.filter(
+        (link) => link.id !== data.id
+      );
       queryClient.setQueryData("selfData", {
         ...oldData,
-        otherProfiles: oldData.otherProfiles.filter(
-          (profile) => profile.id !== profileId
-        ),
-      });
-    },
-  });
-
-  const updateProfileLinkMutation = useMutation(updateProfileLink, {
-    onSuccess: () => {
-      const oldData = queryClient.getQueryData("selfData");
-      queryClient.setQueryData("selfData", {
-        ...oldData,
-        otherProfiles: oldData.otherProfiles.map((profile) =>
-          profile.id === profileId ? { ...profile, ...newData } : profile
-        ),
+        otherProfiles: newLinks,
       });
     },
   });
@@ -73,20 +62,21 @@ function Profile({ selfDataQuery }) {
           <div className="flex justify-between items-center gap-[1rem]">
             <Avatar src={user.image} />
             <Box>
-              <Typography
-                variant="h4"
-                color="neutral.dark"
-                fontWeight="500"
-                sx={{
-                  "&:hover": {
-                    color: "primary.main",
-                    cursor: "pointer",
-                  },
-                }}
-                onClick={() => navigate(`/profile/${user.id}`)}
-              >
-                {user.name}
-              </Typography>
+              <Link href={`/profile/${user.id}`}>
+                <Typography
+                  variant="h4"
+                  color="neutral.dark"
+                  fontWeight="500"
+                  sx={{
+                    "&:hover": {
+                      color: "primary.main",
+                      cursor: "pointer",
+                    },
+                  }}
+                >
+                  {user.name}
+                </Typography>
+              </Link>
               <Typography color="neutral.main">
                 {user._count.followers} followers
               </Typography>
@@ -165,16 +155,15 @@ function Profile({ selfDataQuery }) {
               Other Profiles
             </Typography>
             <Tooltip title="Add Profile" placement="left">
-              <IconButton>
+              <IconButton onClick={() => setOpenNewLinkModal(true)}>
                 <AddRoundedIcon sx={{ color: "neutral.main" }} />
               </IconButton>
             </Tooltip>
           </Box>
-
           {user.otherProfiles.map((profile) => (
             <Box
               key={profile.id}
-              className="flex justify-between items-center gap-4 mb-2 p-2"
+              className="flex justify-between items-center gap-4 pl-2"
               sx={{
                 "&:hover": {
                   cursor: "pointer",
@@ -197,13 +186,28 @@ function Profile({ selfDataQuery }) {
                       window.open(profile.otherProfileLink, "_blank");
                     }}
                   >
-                    {profile.otherProfileLink}
+                    {profile.otherProfileLink
+                      .replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
+                      .split(".")[0]
+                      .charAt(0)
+                      .toUpperCase() +
+                      profile.otherProfileLink
+                        .replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
+                        .split(".")[0]
+                        .slice(1)}
                   </Typography>
                 </Box>
               </div>
-              <Tooltip title="Edit Profile" placement="left">
-                <IconButton>
-                  <EditOutlined sx={{ color: "neutral.main" }} />
+              <Tooltip title="Remove Link" placement="left">
+                <IconButton
+                  onClick={() => {
+                    deleteProfileLinkMutation.mutate({
+                      data: profile.id,
+                      token: token,
+                    });
+                  }}
+                >
+                  <ClearRoundedIcon sx={{ color: "neutral.main" }} />
                 </IconButton>
               </Tooltip>
             </Box>
@@ -217,6 +221,11 @@ function Profile({ selfDataQuery }) {
         defaultBio={user.bio}
         defaultLocation={user.location}
         defaultOccupation={user.occupation}
+      />
+
+      <ProfileLinkModal
+        openModal={openNewLinkModal}
+        setOpenModal={setOpenNewLinkModal}
       />
     </>
   );

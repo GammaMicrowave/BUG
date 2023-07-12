@@ -10,7 +10,7 @@ import { dehydrate, QueryClient, useQuery, useQueries } from "react-query";
 
 import React from "react";
 
-export async function getServerSideProps({ req, res }) {
+export async function getServerSideProps({ req, res, query }) {
   // const time = new Date().getTime();
   const queryClient = new QueryClient();
   const token = req.cookies["jwt_token"];
@@ -48,35 +48,25 @@ export async function getServerSideProps({ req, res }) {
     props: {
       dehydratedState: dehydrate(queryClient),
       token,
+      userId: query.userId,
     },
   };
 }
 
-function home({ token }) {
-  const [selfDataQuery, followersListQuery, followingListQuery, postListQuery] =
-    useQueries([
-      {
-        queryKey: ["selfData"],
-        queryFn: () => getSelfData(token),
-      },
-      {
-        queryKey: ["followersList"],
-        queryFn: () => getFollowersList(token),
-      },
-      {
-        queryKey: ["followingList"],
-        queryFn: () => getFollowingList(token),
-      },
-      {
-        queryKey: ["posts"],
-        queryFn: () => getAllPosts(token),
-      },
-    ]);
+function home({ token, userId }) {
+  const [userDataQuery, postListQuery] = useQueries([
+    {
+      queryKey: ["selfData"],
+      queryFn: () => getSelfData(token),
+    },
+    {
+      queryKey: ["posts"],
+      queryFn: () => getAllPosts(token),
+    },
+  ]);
 
   if (
-    selfDataQuery.isLoading ||
-    followersListQuery.isLoading ||
-    followingListQuery.isLoading ||
+    userDataQuery.isLoading ||
     postListQuery.isLoading
   ) {
     return (
@@ -92,48 +82,29 @@ function home({ token }) {
 
   return (
     <>
-      <Container maxWidth={false} className="flex flex-row flex-nowrap gap-8">
-        <Box className=" justify-start lg:hidden md:flex hidden basis-2/5  flex-col flex-nowrap gap-4">
+      <Container
+        maxWidth={false}
+        className="flex flex-col md:flex-row flex-nowrap gap-8 justify-center"
+      >
+        <Box className=" justify-start lg:hidden flex basis-2/5  flex-col flex-nowrap gap-4">
           <Box
             className="flex justify-center items-center p-4 rounded-md"
             sx={{ bgcolor: "background.alt" }}
           >
-            <Profile selfDataQuery={selfDataQuery} />
-          </Box>
-          <Box className="justify-start items-center flex flex-col w-full gap-4">
-            <ListOfUsers
-              heading="Following"
-              followingListQuery={followingListQuery}
-            />
-            <ListOfUsers
-              heading="Followers"
-              followersListQuery={followersListQuery}
-            />
+            <Profile selfDataQuery={userDataQuery} />
           </Box>
         </Box>
         <Box
           className="hidden lg:flex basis-1/4 justify-center items-start p-4 rounded-md h-fit sticky top-20"
           sx={{ bgcolor: "background.alt" }}
         >
-          <Profile selfDataQuery={selfDataQuery} />
+          <Profile selfDataQuery={userDataQuery} />
         </Box>
-        <Box className="flex-grow basis-1/2 flex flex-col gap-4">
-          <UploadPost />
-          {/* <Post />
-          <Post /> */}
+        <Box className="flex-grow md:flex-grow-0 basis-1/2 flex flex-col gap-4">
+          {/* <UploadPost /> */}
           {postListQuery.data.map((post) => (
             <Post key={post.id} author={post.author} post={post} />
           ))}
-        </Box>
-        <Box className="hidden lg:flex basis-1/4 justify-start items-center flex-col w-full gap-4">
-          <ListOfUsers
-            heading="Following"
-            followingListQuery={followingListQuery}
-          />
-          <ListOfUsers
-            heading="Followers"
-            followersListQuery={followersListQuery}
-          />
         </Box>
       </Container>
     </>

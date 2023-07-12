@@ -12,7 +12,7 @@ const userRouter = Router();
 
 userRouter.get("/", getUserData);
 userRouter.post("/profile-link", addNewProfileLink);
-userRouter.delete("/profile-link", deleteProfileLink);
+userRouter.post("/profile-link/delete", deleteProfileLink);
 userRouter.patch("/profile-link", updateProfileLink);
 userRouter.patch("/", upload.single("image"), updateProfile);
 

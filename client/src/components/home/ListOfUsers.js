@@ -14,6 +14,7 @@ import { useState } from "react";
 import cookieCutter, { set } from "cookie-cutter";
 import { useMutation, useQueryClient } from "react-query";
 import { removeFollower, removeFollowing } from "@/API/follow.api";
+import Link from "next/link";
 
 function ListOfUsers({ heading, followersListQuery, followingListQuery }) {
   const queryClient = useQueryClient();
@@ -88,11 +89,11 @@ function ListOfUsers({ heading, followersListQuery, followingListQuery }) {
         {userList.map((user, index) => (
           <>
             <Box
-              key={user.id}
+              // key={user.id}
               className="flex justify-between items-center p-4"
               gap="0.5rem"
               pb="1.1rem"
-              onClick={() => navigate(`/profile/${user.id}`)}
+              // onClick={() => navigate(`/profile/${user.id}`)}
               sx={{
                 "&:hover": {
                   cursor: "pointer",
@@ -100,21 +101,23 @@ function ListOfUsers({ heading, followersListQuery, followingListQuery }) {
                 },
               }}
             >
-              <div className="flex justify-between items-center gap-[1rem]">
-                <Avatar src={user.image} />
-                <Box>
-                  <Typography
-                    variant="h4"
-                    color="neutral.dark"
-                    fontWeight="500"
-                  >
-                    {user.name}
-                  </Typography>
-                  <Typography color="neutral.main">
-                    {user._count.followers} followers
-                  </Typography>
-                </Box>
-              </div>
+              <Link href={`/profile/${user.id}`} key={user.id}>
+                <div className="flex justify-between items-center gap-[1rem]">
+                  <Avatar src={user.image} />
+                  <Box>
+                    <Typography
+                      variant="h4"
+                      color="neutral.dark"
+                      fontWeight="500"
+                    >
+                      {user.name}
+                    </Typography>
+                    <Typography color="neutral.main">
+                      {user._count.followers} followers
+                    </Typography>
+                  </Box>
+                </div>
+              </Link>
               <Tooltip title="Remove" placement="left">
                 <IconButton
                   onClick={(e) => {

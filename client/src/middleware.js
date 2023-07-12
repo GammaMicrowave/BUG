@@ -5,14 +5,15 @@ export function middleware(request) {
   if (isLoggedIn) {
     if (
       request.nextUrl.pathname === "/signin" ||
-      request.nextUrl.pathname === "/signup"
+      request.nextUrl.pathname === "/signup" ||
+      request.nextUrl.pathname === "/"
     ) {
-      url.pathname = "/";
+      url.pathname = "/home";
       return NextResponse.redirect(url);
     }
   } else {
     const pathname = request.nextUrl.pathname;
-    if (pathname !== "/signin" && pathname !== "/signup" && pathname !== "/") {
+    if (pathname !== "/signin" && pathname !== "/signup") {
       url.pathname = "/signin";
       return NextResponse.redirect(url);
     }

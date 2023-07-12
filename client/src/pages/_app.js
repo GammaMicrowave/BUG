@@ -23,6 +23,7 @@ import { socketInit } from "@/config/socket.config.js";
 import { useRouter } from "next/router";
 import { enqueueSnackbar } from "notistack";
 import { socketNewMessage } from "@/API/socket.api";
+import NextNprogress from "nextjs-progressbar";
 
 let socket;
 
@@ -75,6 +76,7 @@ export default function App({ Component, pageProps }) {
             <ThemeProvider theme={theme}>
               <CssBaseline />
               <SnackbarProvider maxSnack={3}>
+                <NextNprogress color="#29D" height={3} />
                 {Component.showDrawer && isLoggedIn && (
                   <Drawer open={open} setOpen={setOpen} />
                 )}
