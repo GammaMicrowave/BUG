@@ -1,14 +1,10 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
@@ -30,8 +26,8 @@ model User {
   following     User[]                      @relation("UserToUser")
   followers     User[]                      @relation("UserToUser")
   message       Message[]
-  chats         Chat[]                      @relation("Users") //All the chats user is in.
-  adminChats    Chat[]                      @relation("Admins") //All the chats user is admin of.
+  chats         Chat[]                      @relation("Users")
+  adminChats    Chat[]                      @relation("Admins")
 
   @@index([email])
 }
@@ -39,20 +35,20 @@ model User {
 model otherProfilesUserRelation {
   id               String @id @default(uuid())
   userId           String
-  userRelation     User   @relation(fields: [userId], references: [id])
   otherProfileLink String
+  userRelation     User   @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
 
 model Post {
   id        String    @id @default(uuid())
-  image     String?
   content   String    @db.VarChar(1000)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
   authorId  String
+  image     String?
   author    User      @relation(fields: [authorId], references: [id])
 
   @@index([authorId])
@@ -62,11 +58,11 @@ model Chat {
   id          String    @id @default(uuid())
   chatName    String    @default("")
   isGroupChat Boolean   @default(false)
-  users       User[]    @relation("Users") //All the users in the group.
-  groupAdmins User[]    @relation("Admins") //All the admins of the group.
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  messages    Message[] @relation("Messages") //All the messages in the chat.
+  users       User[]    @relation("Users")
+  groupAdmins User[]    @relation("Admins")
+  messages    Message[] @relation("Messages")
 
   @@index([chatName])
 }
@@ -78,9 +74,36 @@ model Message {
   updatedAt DateTime @updatedAt
   chatId    String
   authorId  String
-  chat      Chat     @relation("Messages", fields: [chatId], references: [id]) //The chat the message is in.
+  chat      Chat     @relation("Messages", fields: [chatId], references: [id])
   author    User     @relation(fields: [authorId], references: [id])
 
   @@index([chatId])
   @@index([authorId])
+}
+
+model Admins {
+  A String
+  B String
+
+  @@unique([A, B], map: "_Admins_AB_unique")
+  @@index([B], map: "_Admins_B_index")
+  @@map("_Admins")
+}
+
+model UserToUser {
+  A String
+  B String
+
+  @@unique([A, B], map: "_UserToUser_AB_unique")
+  @@index([B], map: "_UserToUser_B_index")
+  @@map("_UserToUser")
+}
+
+model Users {
+  A String
+  B String
+
+  @@unique([A, B], map: "_Users_AB_unique")
+  @@index([B], map: "_Users_B_index")
+  @@map("_Users")
 }
